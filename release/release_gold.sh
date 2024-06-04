@@ -50,7 +50,7 @@ function check_usage {
 function invoke_github_api {
 	local curl_response=$(\
 		curl \
-			"https://api.github.com/repos/liferay/${1}" \
+			"https://api.github.com/repos/lucasmiranda0/${1}" \
 			--data "${2}" \
 			--fail \
 			--header "Accept: application/vnd.github+json" \
@@ -202,4 +202,7 @@ function tag_release {
 	fi
 }
 
-main
+if [ "${1}" != "--source-only" ]; then
+	echo "asdfasdfasdf"
+    main
+fi

@@ -1,0 +1,16 @@
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run test script
+        run: ./release/test_tag_release.sh
+
+      - name: Set environment variabls
+        run: echo "RELEASE_GITHUB_PAT=${{ secrets.RELEASE_GITHUB_PAT }}" >> $GITHUB_ENV
