@@ -69,6 +69,7 @@ function main {
 
 	test_health_status
 
+	test_docker_image_bundle
 	test_docker_image_files
 	test_docker_image_fix_pack_installed
 	test_docker_image_hotfix_installed
@@ -165,6 +166,46 @@ function stop_container {
 
 	docker kill "${CONTAINER_ID}" > /dev/null
 	docker rm "${CONTAINER_ID}" > /dev/null
+}
+
+function test_docker_image_bundle {
+	export CONTAINER_EXPORTED_PORT=$(docker port "${CONTAINER_ID}" 8080 | head -n 1 | awk -F: '{print $2}')
+
+	if [ ! -d "playwright" ]
+	then
+		echo "Unable to find directory playwright"
+
+		exit 1
+	fi
+
+	cd playwright
+
+	echo "Installing dependencies..."
+
+	npm init playwright -- --quiet --yes &>/dev/null
+
+	for file in $(ls --almost-all | grep --extended-regexp --invert-match '^(node_modules|package.json|package-lock.json|tests)$')
+	do
+		rm -fr "${file}"
+	done
+
+	echo "Running test..."
+
+	local playwright_test_result=$(npx playwright test)
+
+	if [[ -z "$playwright_test_result" || $playwright_test_result == *"failed"* ]]
+	then
+		log_test_failure
+
+		echo "${playwright_test_result}"
+	else
+		log_test_success
+	fi
+
+	for file in $(ls --almost-all | grep --extended-regexp --invert-match '^(tests)$')
+	do
+		rm -fr "${file}"
+	done
 }
 
 function test_docker_image_files {
