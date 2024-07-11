@@ -1,0 +1,1 @@
+echo "I'm a custom script and I can read the secret! API_KEY is $MY_API_KEY"
