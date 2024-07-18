@@ -131,7 +131,7 @@ function get_new_tags {
 	# shellcheck disable=SC2013
 	for tag_name in $(cat "${TAGS_FILE_EE}")
 	do
-		if (! grep -qw "${tag_name}" "${TAGS_FILE_DXP}")
+		if (! grep -qw "^${tag_name}$" "${TAGS_FILE_DXP}")
 		then
 			echo "${tag_name}" >> "${TAGS_FILE_NEW}"
 		fi
@@ -181,7 +181,7 @@ function main {
 
 	for tag_name in $(cat "${TAGS_FILE_NEW}")
 	do
-		local branch_name=$(echo "${tag_name}" | sed -e "s/-.*//" -e 's@\(2023\.q[1-4]\).*@\1@')
+		local branch_name=$(echo "${tag_name}" | sed -e "s/-.*//" -e 's@\(202[3-4]\.q[1-4]\).*@\1@')
 
 		echo ""
 
