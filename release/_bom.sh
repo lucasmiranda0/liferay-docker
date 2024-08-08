@@ -1,5 +1,28 @@
 #!/bin/bash
 
+function copy_tld {
+	local tlds="${1}"
+
+	for index in ${!tlds[@]}
+	do
+		if [ "${index}" -eq "${#tlds[@]}" ]
+		then
+			tlds+=("-name \"${tld}\"")
+		else
+			tlds+=("-name \"${tld}\" -o")
+		fi
+	done
+
+	for file in $(find "${_PROJECTS_DIR}" \
+		"${tlds}" -type f | \
+		awk -F "/" "{print $NF, $0}" | \
+		sort -k 1,1 -u | \
+		awk "{print $2}")
+	do
+		cp "${file}" "${2}"
+	done
+}
+
 function generate_api_jars {
 	mkdir -p "${_BUILD_DIR}/boms"
 
@@ -75,6 +98,47 @@ function generate_api_jars {
 	find "${_BUNDLES_DIR}/osgi" "${_BUNDLES_DIR}/tomcat/webapps/ROOT/WEB-INF/shielded-container-lib" -name "com.liferay.*.jar" -type f -print0 | while IFS= read -r -d '' module_jar
 	do
 		_manage_bom_jar "${module_jar}"
+	done
+
+	for file in $(ls api-jar/META-INF --almost-all | grep --extended-regexp --invert-match '^(alloy-util.tld|alloy.tld|c.tld|liferay.tld)$')
+	do
+		if [[ "${file}" == *.tld ]]
+		then
+			rm "api-jar/META-INF/${file}"
+		fi
+	done
+
+	copy_tld "("liferay-*.tld" "ratings.tld")" "api-jar/META-INF"
+
+	mkdir -p api-jar/META-INF/resources/WEB-INF
+
+	for file in $(find "${_PROJECTS_DIR}" \
+		-name "liferay-application-list.tld" -o \
+		-name "liferay-data-engine.tld" -o \
+		-name "liferay-ddm.tld" -o \
+		-name "liferay-export-import-changeset.tld" -o \
+		-name "liferay-form.tld" -o \
+		-name "liferay-staging.tld" -o \
+		-name "liferay-template.tld" -o \
+		-name "react.tld" -o \
+		-name "soy.tld" -type f | \
+		awk -F "/" "{print $NF, $0}" | \
+		sort -k 1,1 -u | \
+		awk "{print $2}")
+	do
+		cp "${file}" api-jar/META-INF/resources
+	done
+
+	for file in $(find "${_PROJECTS_DIR}" \
+		-name "liferay-*.tld" -o \
+		-name "ratings.tld" -o \
+		-name "react.tld" -o \
+		-name "soy.tld" -type f | \
+		awk -F / '{print $NF, $0}' | \
+		sort -k 1,1 -u | \
+		awk '{print $2}')
+	do
+		cp "${file}" api-jar/META-INF/resources/WEB-INF
 	done
 }
 
