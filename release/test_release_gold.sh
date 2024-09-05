@@ -14,7 +14,7 @@ function main {
 function set_up {
 	export LIFERAY_COMMON_EXIT_CODE_OK=0
 	export LIFERAY_COMMON_EXIT_CODE_SKIPPED=4
-	export LIFERAY_RELEASE_REPOSITORY_OWNER="natocesarrego"
+	export LIFERAY_RELEASE_REPOSITORY_OWNER="lucasmiranda0"
 	export LIFERAY_RELEASE_VERSION="test-tag"
 }
 
