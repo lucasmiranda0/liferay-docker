@@ -1,58 +1,68 @@
 #!/bin/bash
 
 source ../_test_common.sh
+source _bom.sh
 source _liferay_common.sh
-source _promotion.sh
 
 function main {
 	set_up
 
-	prepare_jars_for_promotion xanadu
-	prepare_poms_for_promotion xanadu
+	if [ "${?}" -eq "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}" ]
+	then
+		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+	fi
 
-	test_prepare_resources_for_promotion
+	generate_distro_jar &> /dev/null
+
+	test_generate_distro_jar
 
 	tear_down
 }
 
 function set_up {
-	export LIFERAY_COMMON_EXIT_CODE_BAD=1
+	export _RELEASE_ROOT_DIR="${PWD}"
+
+	export _PROJECTS_DIR="${_RELEASE_ROOT_DIR}"/../..
+
+	if [ ! -d "${_PROJECTS_DIR}/liferay-portal-ee" ]
+	then
+		echo -e "The directory ${_PROJECTS_DIR}/liferay-portal-ee does not exist. Run this test locally.\n"
+
+		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+	fi
+
 	export LIFERAY_RELEASE_PRODUCT_NAME="dxp"
-	export LIFERAY_RELEASE_RC_BUILD_TIMESTAMP="1721635298"
-	export LIFERAY_RELEASE_VERSION="2024.q2.6"
+	export LIFERAY_RELEASE_VERSION="2024.q2.0"
+
+	export _BUILD_DIR="${_RELEASE_ROOT_DIR}/release-data/build"
+
+	export _BUNDLES_DIR="${_RELEASE_ROOT_DIR}/release-data/dev/projects/bundles"
 
 	export _PRODUCT_VERSION="${LIFERAY_RELEASE_VERSION}"
 
-	export _ARTIFACT_RC_VERSION="${_PRODUCT_VERSION}-${LIFERAY_RELEASE_RC_BUILD_TIMESTAMP}"
+	lc_cd "${_RELEASE_ROOT_DIR}"
 
-	export _RELEASE_ROOT_DIR="${PWD}"
+	mkdir -p release-data
 
-	export _PROMOTION_DIR="${_RELEASE_ROOT_DIR}/release-data/promotion/files"
+	lc_cd release-data
 
-	mkdir -p "${_PROMOTION_DIR}"
-
-	lc_cd "${_PROMOTION_DIR}"
+	mkdir -p "${_RELEASE_ROOT_DIR}/release-data/build/boms"
 }
 
 function tear_down {
-	lc_cd ..
+	rm -fr "${_RELEASE_ROOT_DIR}/release-data/build/boms"
 
-	rm -fr "${_PROMOTION_DIR}"
-
-	unset LIFERAY_COMMON_EXIT_CODE_BAD
 	unset LIFERAY_RELEASE_PRODUCT_NAME
-	unset LIFERAY_RELEASE_RC_BUILD_TIMESTAMP
 	unset LIFERAY_RELEASE_VERSION
-	unset _ARTIFACT_RC_VERSION
+	unset _BUILD_DIR
+	unset _BUNDLES_DIR
 	unset _PRODUCT_VERSION
-	unset _PROMOTION_DIR
+	unset _PROJECTS_DIR
 	unset _RELEASE_ROOT_DIR
 }
 
-function test_prepare_resources_for_promotion {
-	assert_equals \
-		"$(find "${_PROMOTION_DIR}" -name "release.dxp.distro-${LIFERAY_RELEASE_VERSION}.jar" | grep -c /)" 1 \
-		"$(find "${_PROMOTION_DIR}" -name "release.dxp.distro-${LIFERAY_RELEASE_VERSION}.pom" | grep -c /)" 1
+function test_generate_distro_jar {
+	assert_equals "$(find "${_RELEASE_ROOT_DIR}" -name "release.dxp.distro-${LIFERAY_RELEASE_VERSION}*.jar" | grep -c /)" 1
 }
 
 main
