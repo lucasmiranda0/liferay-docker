@@ -139,7 +139,7 @@ function _process_product_version {
 	        "productVersion": "$(lc_get_property "${release_properties_file}" liferay.product.version)",
 	        "promoted": "false",
 	        "releaseKey": "$(echo "${product_name}-${product_version}" | sed "s/\([0-9]\+\)\.\([0-9]\+\)\.[0-9]\+\(-\|[^0-9]\)/\1.\2\3/g" | sed -e "s/portal-7\.4\.[0-9]*-ga/portal-7.4-ga/")",
-	        "targetPlatformVersion": "$(lc_get_property "${release_properties_file}" target.platform.version)",
+	        "targetPlatformVersion": "$(lc_get_property "${release_properties_file}" target.platform.version | tr -d "a-z")",
 	        "url": "https://releases-cdn.liferay.com/${product_name}/${product_version}"
 	    }
 	]
