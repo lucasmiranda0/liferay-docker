@@ -1,8 +1,8 @@
 #!/bin/bash
 
+source ../_liferay_common.sh
 source _bom.sh
 source _git.sh
-source _liferay_common.sh
 source _package.sh
 source _product.sh
 source _promotion.sh
