@@ -14,7 +14,7 @@ function main {
 function set_up {
 	export LIFERAY_COMMON_EXIT_CODE_OK=0
 	export LIFERAY_COMMON_EXIT_CODE_SKIPPED=4
-	export LIFERAY_RELEASE_REPOSITORY_OWNER="natocesarrego"
+	export LIFERAY_RELEASE_REPOSITORY_OWNER="lucasmiranda0"
 	export LIFERAY_RELEASE_VERSION="test-tag"
 }
 
@@ -33,7 +33,7 @@ function test_invoke_github_api_post {
 		{
 			"message": "",
 			"ref": "refs/tags/${LIFERAY_RELEASE_VERSION}",
-			"sha": "d4e20d5ccbd8dd3ca5d9a9e03f80e293256b5560"
+			"sha": "bc425dc709b850edaeaa392147145955720664a6"
 		}
 		END
 	)
@@ -42,7 +42,7 @@ function test_invoke_github_api_post {
 		cat <<- END
 		{
 			"message": "",
-			"object": "d4e20d5ccbd8dd3ca5d9a9e03f80e293256b5560",
+			"object": "bc425dc709b850edaeaa392147145955720664a6",
 			"tag": "${LIFERAY_RELEASE_VERSION}",
 			"type": "commit"
 		}
