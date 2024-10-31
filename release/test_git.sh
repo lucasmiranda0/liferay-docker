@@ -25,12 +25,12 @@ function set_up {
 
 	export _PROJECTS_DIR="${_RELEASE_ROOT_DIR}"/../..
 
-	if [ ! -d "${_PROJECTS_DIR}/liferay-portal-ee" ]
-	then
-		echo "The directory ${_PROJECTS_DIR}/liferay-portal-ee does not exist."
+	# if [ ! -d "${_PROJECTS_DIR}/liferay-portal-ee" ]
+	# then
+	# 	echo "The directory ${_PROJECTS_DIR}/liferay-portal-ee does not exist."
 
-		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	fi
+	# 	return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+	# fi
 
 	export _BUILD_DIR="${_PROJECTS_DIR}/liferay-portal-ee"
 
