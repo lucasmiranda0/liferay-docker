@@ -43,12 +43,12 @@ function set_up {
 	export _PROJECTS_DIR="${_RELEASE_ROOT_DIR}"/../..
 	export _RELEASE_TOOL_DIR="${_RELEASE_ROOT_DIR}"
 
-	if [ ! -d "${_PROJECTS_DIR}/liferay-portal-ee" ]
-	then
-		echo -e "The directory ${_PROJECTS_DIR}/liferay-portal-ee does not exist.\n"
+	# if [ ! -d "${_PROJECTS_DIR}/liferay-portal-ee" ]
+	# then
+	# 	echo -e "The directory ${_PROJECTS_DIR}/liferay-portal-ee does not exist.\n"
 
-		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	fi
+	# 	return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+	# fi
 
 	lc_cd "${_RELEASE_ROOT_DIR}/test-dependencies"
 

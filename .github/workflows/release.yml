@@ -7,6 +7,9 @@ jobs:
         steps:
             - name: Checkout code
               uses: actions/checkout@v2
+              with:
+                  ssh-key: ${{ secrets.SSH_PRIVATE_KEY_PORTAL_EE }}
+                  repository: lucasmiranda0/portal-ee
             - name: Execute run_tests.sh
               run: ./run_tests.sh
               shell: bash
