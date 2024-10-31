@@ -2,11 +2,17 @@ jobs:
     release:
         env:
             LIFERAY_RELEASE_GITHUB_PAT: ${{ secrets.LIFERAY_RELEASE_GITHUB_PAT }}
-        if: (github.repository == 'liferay-release/liferay-docker')
+        if: (github.repository == 'lucasmiranda0/liferay-docker')
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
               uses: actions/checkout@v2
+            - name: Clone private repository
+              run: |
+                git clone https://$LIFERAY_RELEASE_GITHUB_PAT@github.com/lucasmiranda0/liferay-portal-ee.git /tmp/liferay-portal-ee
+              shell: bash
+            - name: Set _BUILD_DIR environment variable
+              run: echo "_BUILD_DIR=/tmp/liferay-portal-ee" >> $GITHUB_ENV              
             - name: Execute run_tests.sh
               run: ./run_tests.sh
               shell: bash
