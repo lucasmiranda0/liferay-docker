@@ -245,6 +245,8 @@ function generate_pom_release_bom {
 	find "${_PROJECTS_DIR}/liferay-portal-ee/modules/.releng" -name '*.properties' -print0 | \
 		xargs -0 awk -F= '/^artifact.url=/  { print $2 }' \
 		> /tmp/artifact_urls.txt
+	echo "tamanho artifact_urls.txt:"
+	wc -l /tmp/artifact_urls.txt
 
 	for artifact_file in $(
 		find "${_BUNDLES_DIR}/osgi" "${_BUNDLES_DIR}/tomcat/lib/ext" "${_BUNDLES_DIR}/tomcat/webapps/ROOT/WEB-INF" -name '*.jar' | \

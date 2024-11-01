@@ -7,11 +7,6 @@ source _bom.sh
 function main {
 	set_up
 
-	if [ $? -eq "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}" ]
-	then
-		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	fi
-
 	test_generate_pom_release_bom_api_dxp
 	test_generate_pom_release_bom_compile_only_dxp
 	test_generate_pom_release_bom_distro_dxp
@@ -24,6 +19,19 @@ function main {
 
 	_ARTIFACT_RC_VERSION="$(echo "${_PRODUCT_VERSION}" | cut -d '-' -f 1)-${_BUILD_TIMESTAMP}"
 
+	if [ -n "${LIFERAY_RELEASE_GITHUB_PAT}" ]
+	then
+		rm -fr "liferay-portal-ee"
+
+		local sha=$(_get_tag_sha)
+
+		_get_github_repository_zip
+
+		unzip -q "liferay-portal-ee.zip"
+
+		mv "lucasmiranda0-liferay-portal-ee-${sha}" "liferay-portal-ee"
+	fi
+
 	test_generate_pom_release_bom_api_portal
 	test_generate_pom_release_bom_compile_only_portal
 	test_generate_pom_release_bom_distro_portal
@@ -33,6 +41,28 @@ function main {
 	tear_down
 }
 
+function _get_github_repository_zip {
+	curl -L -H "Authorization: token ${LIFERAY_RELEASE_GITHUB_PAT}" \
+			-o liferay-portal-ee.zip \
+			"https://api.github.com/repos/lucasmiranda0/liferay-portal-ee/zipball/$_PRODUCT_VERSION"
+}
+
+function _get_tag_sha {
+	local sha=$(curl -s -H "Authorization: token ${LIFERAY_RELEASE_GITHUB_PAT}" \
+			-H "Accept: application/vnd.github.v3+json" \
+			https://api.github.com/repos/lucasmiranda0/liferay-portal-ee/git/ref/tags/$_PRODUCT_VERSION \
+			| jq -r '.object.sha')
+
+	if [ -z "${sha}" ] || [ "${sha}" == "null" ]
+	then
+		echo "Error: Unable to retrieve SHA for tag ${_PRODUCT_VERSION}"
+
+		exit 1
+	fi
+
+	echo "${sha}"
+}
+
 function set_up {
 	export LIFERAY_RELEASE_PRODUCT_NAME="dxp"
 	export _BUILD_TIMESTAMP=12345
@@ -40,14 +70,29 @@ function set_up {
 	export _RELEASE_ROOT_DIR="${PWD}"
 
 	export _ARTIFACT_RC_VERSION="${_PRODUCT_VERSION}-${_BUILD_TIMESTAMP}"
-	export _PROJECTS_DIR="${_RELEASE_ROOT_DIR}"/../..
 	export _RELEASE_TOOL_DIR="${_RELEASE_ROOT_DIR}"
 
-	if [ ! -d "${_PROJECTS_DIR}/liferay-portal-ee" ]
+	if [ -n "${LIFERAY_RELEASE_GITHUB_PAT}" ]
 	then
-		echo -e "The directory ${_PROJECTS_DIR}/liferay-portal-ee does not exist.\n"
+		export _PROJECTS_DIR="${PWD}"
 
-		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+		local sha=$(_get_tag_sha)
+
+		_get_github_repository_zip
+
+		unzip -q "liferay-portal-ee.zip"
+
+		mv "lucasmiranda0-liferay-portal-ee-${sha}" "liferay-portal-ee"
+	else
+		export _PROJECTS_DIR="${_RELEASE_ROOT_DIR}"/../..
+
+		lc_cd "${_PROJECTS_DIR}"/liferay-portal-ee
+
+		git branch --delete "${_PRODUCT_VERSION}" &> /dev/null
+
+		git fetch --no-tags upstream "${_PRODUCT_VERSION}":"${_PRODUCT_VERSION}" &> /dev/null
+
+		git checkout --quiet "${_PRODUCT_VERSION}"
 	fi
 
 	lc_cd "${_RELEASE_ROOT_DIR}/test-dependencies"
@@ -66,19 +111,13 @@ function set_up {
 
 	unzip -q liferay-portal-tomcat-7.4.3.120-ga120-1718225443.zip
 
-	lc_cd "${_PROJECTS_DIR}"/liferay-portal-ee
-
-	git branch --delete "${_PRODUCT_VERSION}" &> /dev/null
-
-	git fetch --no-tags upstream "${_PRODUCT_VERSION}":"${_PRODUCT_VERSION}" &> /dev/null
-
-	git checkout --quiet "${_PRODUCT_VERSION}"
-
 	lc_cd "${_RELEASE_ROOT_DIR}"
 }
 
 function tear_down {
 	rm -fr "${_BUNDLES_DIR}"
+	rm -fr "${_PROJECTS_DIR}/liferay-portal-ee"
+	rm -f "${_PROJECTS_DIR}/liferay-portal-ee.zip"
 	rm -fr "${_RELEASE_ROOT_DIR}/test-dependencies/liferay-dxp"
 	rm -f "${_RELEASE_ROOT_DIR}/test-dependencies/liferay-dxp-tomcat-2024.q2.6-1721635298.zip"
 	rm -f "${_RELEASE_ROOT_DIR}/test-dependencies/liferay-portal-tomcat-7.4.3.120-ga120-1718225443.zip"
@@ -159,7 +198,10 @@ function test_generate_pom_release_bom_dxp {
 	assert_equals \
 		release.${LIFERAY_RELEASE_PRODUCT_NAME}.bom-${_ARTIFACT_RC_VERSION}.pom \
 		test-dependencies/expected.dxp.release.bom.pom
-
+	echo "tamanho1.1:"
+	wc -l release.${LIFERAY_RELEASE_PRODUCT_NAME}.bom-${_ARTIFACT_RC_VERSION}.pom
+	echo "tamanho1.2:"
+	wc -l test-dependencies/expected.dxp.release.bom.pom
 	rm release.${LIFERAY_RELEASE_PRODUCT_NAME}.bom-${_ARTIFACT_RC_VERSION}.pom
 }
 
@@ -169,7 +211,10 @@ function test_generate_pom_release_bom_portal {
 	assert_equals \
 		release.${LIFERAY_RELEASE_PRODUCT_NAME}.bom-${_ARTIFACT_RC_VERSION}.pom \
 		test-dependencies/expected.portal.release.bom.pom
-
+	echo "tamanho2.1:"
+	wc -l release.${LIFERAY_RELEASE_PRODUCT_NAME}.bom-${_ARTIFACT_RC_VERSION}.pom
+	echo "tamanho2.2:"
+	wc -l test-dependencies/expected.portal.release.bom.pom
 	rm release.${LIFERAY_RELEASE_PRODUCT_NAME}.bom-${_ARTIFACT_RC_VERSION}.pom
 }
 
