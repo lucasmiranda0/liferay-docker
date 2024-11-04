@@ -208,7 +208,8 @@ function test_generate_pom_release_bom_dxp {
 	assert_equals \
 		release.${LIFERAY_RELEASE_PRODUCT_NAME}.bom-${_ARTIFACT_RC_VERSION}.pom \
 		test-dependencies/expected.dxp.release.bom.pom
-
+	cat "${_RELEASE_ROOT_DIR}/test-dependencies/af.txt"
+	rm "${_RELEASE_ROOT_DIR}/test-dependencies/af.txt"
 	rm release.${LIFERAY_RELEASE_PRODUCT_NAME}.bom-${_ARTIFACT_RC_VERSION}.pom
 }
 
