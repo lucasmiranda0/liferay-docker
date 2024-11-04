@@ -253,11 +253,12 @@ function generate_pom_release_bom {
 				-e "s@.*/@@" \
 				-e "s@-@.@g" | \
 			grep -v -E "(\.demo|\.sample\.|\.templates\.)" | \
-			sort -d
+			sort
 	)
 	do
-		grep -E "/(com\.liferay\.|)${artifact_file}/" /tmp/artifact_urls.txt | while IFS= read -r artifact_url
+		grep "/\(com\.liferay\.\|\)${artifact_file}/" /tmp/artifact_urls.txt | sort | while IFS= read -r artifact_url
 		do
+			# echo "${artifact_url}" >> "${_RELEASE_ROOT_DIR}/test-dependencies/artifact_url.txt"
 			local file_name="${artifact_url##*/}"
 
 			local artifact_id=$(echo "${file_name}" | cut -d '-' -f 1)
