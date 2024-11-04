@@ -253,9 +253,10 @@ function generate_pom_release_bom {
 				-e "s@.*/@@" \
 				-e "s@-@.@g" | \
 			grep -v -E "(\.demo|\.sample\.|\.templates\.)" | \
-			sort -d
+			sort
 	)
 	do
+		echo "${artifact_file}" >> "${_RELEASE_ROOT_DIR}/test-dependencies/af.txt"
 		grep -E "/(com\.liferay\.|)${artifact_file}/" /tmp/artifact_urls.txt | while IFS= read -r artifact_url
 		do
 			local file_name="${artifact_url##*/}"
