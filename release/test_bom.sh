@@ -7,11 +7,6 @@ source _bom.sh
 function main {
 	set_up
 
-	if [ $? -eq "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}" ]
-	then
-		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	fi
-
 	test_generate_pom_release_bom_api_dxp
 	test_generate_pom_release_bom_compile_only_dxp
 	test_generate_pom_release_bom_distro_dxp
@@ -23,6 +18,19 @@ function main {
 	_PRODUCT_VERSION="7.4.3.120-ga120"
 
 	_ARTIFACT_RC_VERSION="$(echo "${_PRODUCT_VERSION}" | cut -d '-' -f 1)-${_BUILD_TIMESTAMP}"
+
+	if [ -n "${LIFERAY_RELEASE_GITHUB_PAT}" ]
+	then
+		rm -fr "liferay-portal-ee"
+
+		local sha=$(_get_tag_sha "liferay-release" "liferay-portal-ee" "${_PRODUCT_VERSION}" "${LIFERAY_RELEASE_GITHUB_PAT}")
+
+		_get_github_repository_zip "liferay-release" "liferay-portal-ee" "${_PRODUCT_VERSION}" "${LIFERAY_RELEASE_GITHUB_PAT}" 
+
+		unzip -q "repository.zip"
+
+		mv "liferay-release-liferay-portal-ee-${sha}" "liferay-portal-ee"
+	fi
 
 	test_generate_pom_release_bom_api_portal
 	test_generate_pom_release_bom_compile_only_portal
@@ -40,14 +48,29 @@ function set_up {
 	export _RELEASE_ROOT_DIR="${PWD}"
 
 	export _ARTIFACT_RC_VERSION="${_PRODUCT_VERSION}-${_BUILD_TIMESTAMP}"
-	export _PROJECTS_DIR="${_RELEASE_ROOT_DIR}"/../..
 	export _RELEASE_TOOL_DIR="${_RELEASE_ROOT_DIR}"
 
-	if [ ! -d "${_PROJECTS_DIR}/liferay-portal-ee" ]
+	if [ -n "${LIFERAY_RELEASE_GITHUB_PAT}" ]
 	then
-		echo -e "The directory ${_PROJECTS_DIR}/liferay-portal-ee does not exist.\n"
+		export _PROJECTS_DIR="${PWD}"
 
-		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+		local sha=$(_get_tag_sha "liferay-release" "liferay-portal-ee" "${_PRODUCT_VERSION}" "${LIFERAY_RELEASE_GITHUB_PAT}") 
+
+		_get_github_repository_zip "liferay-release" "liferay-portal-ee" "${_PRODUCT_VERSION}" "${LIFERAY_RELEASE_GITHUB_PAT}"
+
+		unzip -q "repository.zip"
+
+		mv "liferay-release-liferay-portal-ee-${sha}" "liferay-portal-ee"
+	else
+		export _PROJECTS_DIR="${_RELEASE_ROOT_DIR}"/../..
+
+		lc_cd "${_PROJECTS_DIR}"/liferay-portal-ee
+
+		git branch --delete "${_PRODUCT_VERSION}" &> /dev/null
+
+		git fetch --no-tags upstream "${_PRODUCT_VERSION}":"${_PRODUCT_VERSION}" &> /dev/null
+
+		git checkout --quiet "${_PRODUCT_VERSION}"
 	fi
 
 	lc_cd "${_RELEASE_ROOT_DIR}/test-dependencies"
@@ -66,18 +89,16 @@ function set_up {
 
 	unzip -q liferay-portal-tomcat-7.4.3.120-ga120-1718225443.zip
 
-	lc_cd "${_PROJECTS_DIR}"/liferay-portal-ee
-
-	git branch --delete "${_PRODUCT_VERSION}" &> /dev/null
-
-	git fetch --no-tags upstream "${_PRODUCT_VERSION}":"${_PRODUCT_VERSION}" &> /dev/null
-
-	git checkout --quiet "${_PRODUCT_VERSION}"
-
 	lc_cd "${_RELEASE_ROOT_DIR}"
 }
 
 function tear_down {
+	if [ -n "${LIFERAY_RELEASE_GITHUB_PAT}" ]
+	then
+		rm -fr "${_PROJECTS_DIR}/liferay-portal-ee"
+		rm -f "${_PROJECTS_DIR}/repository.zip"
+	fi
+
 	rm -fr "${_BUNDLES_DIR}"
 	rm -fr "${_RELEASE_ROOT_DIR}/test-dependencies/liferay-dxp"
 	rm -f "${_RELEASE_ROOT_DIR}/test-dependencies/liferay-dxp-tomcat-2024.q2.6-1721635298.zip"
@@ -197,6 +218,34 @@ function test_generate_pom_release_bom_third_party_portal {
 
 	rm release.${LIFERAY_RELEASE_PRODUCT_NAME}.bom.compile.only-${_ARTIFACT_RC_VERSION}.pom
 	rm release.${LIFERAY_RELEASE_PRODUCT_NAME}.bom.third.party-${_ARTIFACT_RC_VERSION}.pom
+}
+
+function _get_github_repository_zip {
+	curl \
+		"https://api.github.com/repos/${1}/${2}/zipball/${3}" \
+		--header "Authorization: token ${4}" \
+		--location \
+		--output repository.zip \
+		--silent
+}
+
+function _get_tag_sha {
+	local sha=$(\
+		curl \
+			"https://api.github.com/repos/${1}/${2}/git/ref/tags/${3}" \
+			--header "Accept: application/vnd.github.v3+json" \
+			--header "Authorization: token ${4}" \
+			--silent \
+			| jq -r '.object.sha')
+
+	if [ -z "${sha}" ] || [ "${sha}" == "null" ]
+	then
+		echo "Error: Unable to retrieve SHA for tag ${3}"
+
+		exit 1
+	fi
+
+	echo "${sha}"
 }
 
 main
