@@ -40,6 +40,8 @@ function set_up {
 	export _BUILD_TIMESTAMP=12345
 	export _PRODUCT_VERSION="2024.q2.6"
 	export _RELEASE_ROOT_DIR="${PWD}"
+	echo "AQUI 1" >> "${_RELEASE_ROOT_DIR}/log.txt"
+	cat "${_RELEASE_ROOT_DIR}/log.txt"
 
 	export _ARTIFACT_RC_VERSION="${_PRODUCT_VERSION}-${_BUILD_TIMESTAMP}"
 	export _RELEASE_TOOL_DIR="${_RELEASE_ROOT_DIR}"
@@ -47,9 +49,12 @@ function set_up {
 	if [ -n "${LIFERAY_RELEASE_GITHUB_PAT}" ]
 	then
 		export _PROJECTS_DIR="${PWD}"
-
+		echo "AQUI 2" >> "${_RELEASE_ROOT_DIR}/log.txt"
+		cat "${_RELEASE_ROOT_DIR}/log.txt"
 		_extract_repository "liferay-release" "liferay-portal-ee" "${_PRODUCT_VERSION}" "${LIFERAY_RELEASE_GITHUB_PAT}"
 	else
+		echo "WTF???" >> "${_RELEASE_ROOT_DIR}/log.txt"
+		cat "${_RELEASE_ROOT_DIR}/log.txt"
 		export _PROJECTS_DIR="${_RELEASE_ROOT_DIR}"/../..
 
 		lc_cd "${_PROJECTS_DIR}"/liferay-portal-ee
@@ -209,8 +214,11 @@ function test_generate_pom_release_bom_third_party_portal {
 }
 
 function _extract_repository {
+	echo "AQUI 3" >> "${_RELEASE_ROOT_DIR}/log.txt"
+	cat "${_RELEASE_ROOT_DIR}/log.txt"
 	local sha=$(_get_tag_sha "${1}" "${2}" "${3}" "${4}")
-
+	echo "AQUI 5" >> "${_RELEASE_ROOT_DIR}/log.txt"
+	cat "${_RELEASE_ROOT_DIR}/log.txt"
 	_get_github_repository_zip "${1}" "${2}" "${3}" "${4}"
 
 	unzip -q "repository.zip"
@@ -223,17 +231,17 @@ function _get_github_repository_zip {
 		"https://api.github.com/repos/${1}/${2}/zipball/${3}" \
 		--header "Authorization: token ${4}" \
 		--location \
-		--output repository.zip \
-		--silent
+		--output repository.zip
 }
 
 function _get_tag_sha {
+	echo "AQUI 4" >> "${_RELEASE_ROOT_DIR}/log.txt"
+	cat "${_RELEASE_ROOT_DIR}/log.txt"
 	local sha=$(\
 		curl \
 			"https://api.github.com/repos/${1}/${2}/git/ref/tags/${3}" \
 			--header "Accept: application/vnd.github.v3+json" \
 			--header "Authorization: token ${4}" \
-			--silent \
 			| jq -r '.object.sha')
 
 	if [ -z "${sha}" ] || [ "${sha}" == "null" ]
@@ -242,7 +250,7 @@ function _get_tag_sha {
 
 		exit 1
 	fi
-
+	lc_log ERROR "SHA is ${sha}"
 	echo "${sha}"
 }
 
