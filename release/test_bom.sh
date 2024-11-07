@@ -223,8 +223,7 @@ function _get_github_repository_zip {
 		"https://api.github.com/repos/${1}/${2}/zipball/${3}" \
 		--header "Authorization: token ${4}" \
 		--location \
-		--output repository.zip \
-		--silent
+		--output repository.zip
 }
 
 function _get_tag_sha {
@@ -233,7 +232,6 @@ function _get_tag_sha {
 			"https://api.github.com/repos/${1}/${2}/git/ref/tags/${3}" \
 			--header "Accept: application/vnd.github.v3+json" \
 			--header "Authorization: token ${4}" \
-			--silent \
 			| jq -r '.object.sha')
 
 	if [ -z "${sha}" ] || [ "${sha}" == "null" ]
