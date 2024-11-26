@@ -51,7 +51,7 @@ function check_usage {
 	_BUILD_DIR="${_RELEASE_ROOT_DIR}"/build
 	_BUILDER_SHA=$(git rev-parse HEAD)
 	_BUNDLES_DIR="${_RELEASE_ROOT_DIR}"/dev/projects/bundles
-	_PROJECTS_DIR="${_RELEASE_ROOT_DIR}"/dev/projects
+	_PROJECTS_DIR="/opt/dev/projects/github"
 	_RELEASES_DIR="${_RELEASE_ROOT_DIR}"/releases
 	_TEST_RELEASE_DIR="${_RELEASE_ROOT_DIR}"/test_release
 
@@ -59,6 +59,12 @@ function check_usage {
 }
 
 function main {
+
+	echo "cd /root"
+	cd /root
+	echo "ls"
+	ls
+	cd -
 	export ANT_OPTS="-Xmx10G"
 
 	print_variables
@@ -69,11 +75,11 @@ function main {
 
 	lc_time_run report_jenkins_url
 
-	lc_background_run clone_repository liferay-binaries-cache-2020
-	lc_background_run clone_repository liferay-portal-ee
-	lc_background_run clone_repository liferay-release-tool-ee
+	# lc_background_run clone_repository liferay-binaries-cache-2020
+	# lc_background_run clone_repository liferay-portal-ee
+	# lc_background_run clone_repository liferay-release-tool-ee
 
-	lc_wait
+	# lc_wait
 
 	lc_time_run clean_portal_repository
 
