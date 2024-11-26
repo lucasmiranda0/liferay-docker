@@ -50,12 +50,18 @@ function check_usage {
 
 	_BUILD_DIR="${_RELEASE_ROOT_DIR}"/build
 	_BUILDER_SHA=$(git rev-parse HEAD)
-	_BUNDLES_DIR="${_RELEASE_ROOT_DIR}"/dev/projects/bundles
-	_PROJECTS_DIR="${_RELEASE_ROOT_DIR}"/dev/projects
+	_BUNDLES_DIR="/opt/dev/projects/github/bundles"
+	_PROJECTS_DIR="/opt/dev/projects/github"
 	_RELEASES_DIR="${_RELEASE_ROOT_DIR}"/releases
 	_TEST_RELEASE_DIR="${_RELEASE_ROOT_DIR}"/test_release
 
 	LIFERAY_COMMON_LOG_DIR="${_BUILD_DIR}"
+
+	if [ ! -d "${_PROJECTS_DIR}" ]
+	then
+		_BUNDLES_DIR="${_RELEASE_ROOT_DIR}/dev/projects/bundles"
+		_PROJECTS_DIR="${_RELEASE_ROOT_DIR}/dev/projects"
+	fi
 }
 
 function main {
@@ -69,11 +75,11 @@ function main {
 
 	lc_time_run report_jenkins_url
 
-	lc_background_run clone_repository liferay-binaries-cache-2020
-	lc_background_run clone_repository liferay-portal-ee
-	lc_background_run clone_repository liferay-release-tool-ee
+	# lc_background_run clone_repository liferay-binaries-cache-2020
+	# lc_background_run clone_repository liferay-portal-ee
+	# lc_background_run clone_repository liferay-release-tool-ee
 
-	lc_wait
+	# lc_wait
 
 	lc_time_run clean_portal_repository
 
