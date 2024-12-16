@@ -233,6 +233,11 @@ function package_release {
 
 	lc_cd tomcat/webapps/ROOT
 
+	if [[ "${_PRODUCT_VERSION}" == 7.3* ]]
+	then
+		cp "${_PROJECTS_DIR}"/liferay-portal-ee/lib/portal/ccpp.jar WEB-INF/lib
+	fi
+
 	zip -qr "${_BUILD_DIR}/release/liferay-${LIFERAY_RELEASE_PRODUCT_NAME}-${_PRODUCT_VERSION}-${_BUILD_TIMESTAMP}.war" ./*
 
 	lc_cd "${_BUILD_DIR}/release/liferay-${LIFERAY_RELEASE_PRODUCT_NAME}"
