@@ -37,8 +37,13 @@ function check_usage {
 	_RELEASE_ROOT_DIR="${PWD}"
 
 	_BASE_DIR="$(dirname "${_RELEASE_ROOT_DIR}")"
-	_PROJECTS_DIR="${_RELEASE_ROOT_DIR}/dev/projects"
+	_PROJECTS_DIR="$/opt/dev/projects/github"
 	_PROMOTION_DIR="${_RELEASE_ROOT_DIR}/release-data/promotion/files"
+
+	if [ ! -d "${_PROJECTS_DIR}" ]
+	then
+		_PROJECTS_DIR="${_RELEASE_ROOT_DIR}/dev/projects"
+	fi
 
 	rm -fr "${_PROMOTION_DIR}"
 
@@ -73,44 +78,60 @@ function main {
 	then
 		return
 	fi
-
-	check_usage
-
-	check_supported_versions
-
-	init_gcs
-
-	lc_time_run promote_packages
-
-	lc_time_run tag_release
-
-	promote_boms xanadu
-
-	if [[ ! $(echo "${_PRODUCT_VERSION}" | grep "q") ]] &&
-	   [[ ! $(echo "${_PRODUCT_VERSION}" | grep "7.4") ]]
+	echo "0000000000000000"
+	ssh root@lrdcom-vm-1 &> /dev/null
+	echo $?
+	echo "1111111111111111"
+	ssh root@lrdcom-vm-1 ls -d "/www/releases.liferay.com/"
+	echo "2222222222222222"
+	local status=$(ssh -o BatchMode=yes -o ConnectTimeout=5 root@lrdcom-vm-1 echo ok 2>&1)
+	if [[ "${status}" == ok ]]
 	then
-		lc_log INFO "Do not update product_info.json for quarterly and 7.4 releases."
-
-		lc_time_run generate_product_info_json
-
-		lc_time_run upload_product_info_json
+		echo "OK OK OK OK"
+	else
+		echo "NOT NOT NOT NOT"
 	fi
 
-	lc_time_run generate_releases_json
+	# check_usage
 
-	lc_time_run test_boms
+	# check_supported_versions
 
-	lc_time_run add_patcher_project_version
+	# init_gcs
 
-	lc_background_run clone_repository liferay-portal-ee
+	# lc_time_run promote_packages #totest
 
-	lc_wait
+	# lc_time_run tag_release
 
-	lc_time_run clean_portal_repository
+	# promote_boms xanadu #?
 
-	lc_time_run prepare_next_release_branch
+	# if [[ ! $(echo "${_PRODUCT_VERSION}" | grep "q") ]] &&
+	#    [[ ! $(echo "${_PRODUCT_VERSION}" | grep "7.4") ]]
+	# then
+	# 	lc_log INFO "Do not update product_info.json for quarterly and 7.4 releases."
 
-	lc_time_run update_release_info_date
+	# 	lc_time_run generate_product_info_json
+
+	# 	lc_time_run upload_product_info_json
+	# fi
+
+	# lc_time_run generate_releases_json #only have ssh not gcp yet
+
+	# lc_time_run test_boms
+
+	# lc_time_run add_patcher_project_version
+
+	# if [ -d "${_RELEASE_ROOT_DIR}/dev/projects" ]
+	# then
+	# 	lc_background_run clone_repository liferay-portal-ee
+
+	# 	lc_wait
+	# fi
+
+	# lc_time_run clean_portal_repository
+
+	# lc_time_run prepare_next_release_branch
+
+	# lc_time_run update_release_info_date
 
 	#lc_time_run upload_to_docker_hub
 }
