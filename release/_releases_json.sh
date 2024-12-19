@@ -49,12 +49,12 @@ function _process_new_product {
 		LIFERAY_COMMON_DOWNLOAD_SKIP_CACHE="true" lc_download https://releases.liferay.com/releases.json "${releases_json}"
 	fi
 
-	if (grep "${_PRODUCT_VERSION}" "${releases_json}")
-	then
-		lc_log INFO "The version ${_PRODUCT_VERSION} is already in releases.json."
+	# if (grep "${_PRODUCT_VERSION}" "${releases_json}")
+	# then
+	# 	lc_log INFO "The version ${_PRODUCT_VERSION} is already in releases.json."
 
-		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	fi
+	# 	return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+	# fi
 
 	local product_group_version="$(echo "${_PRODUCT_VERSION}" | cut -d '.' -f 1,2)"
 
