@@ -92,11 +92,11 @@ function main {
 		echo "NOT NOT NOT NOT"
 	fi
 
-	# check_usage
+	check_usage
 
-	# check_supported_versions
+	check_supported_versions
 
-	# init_gcs
+	init_gcs
 
 	# lc_time_run promote_packages #totest
 
@@ -114,7 +114,7 @@ function main {
 	# 	lc_time_run upload_product_info_json
 	# fi
 
-	# lc_time_run generate_releases_json #only have ssh not gcp yet
+	lc_time_run generate_releases_json
 
 	# lc_time_run test_boms
 
