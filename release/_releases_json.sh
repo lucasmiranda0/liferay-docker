@@ -168,7 +168,7 @@ function _promote_product_versions {
 function _upload_releases_json {
 	ssh root@lrdcom-vm-1 &> /dev/null
 
-	if [ "${?}" -gt 0 ]
+	if [ "${?}" -eq 0 ]
 	then
 		lc_log INFO "Backing up to /www/releases.liferay.com/releases.json.BACKUP."
 
