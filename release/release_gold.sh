@@ -87,9 +87,9 @@ function main {
 
 	lc_time_run promote_packages
 
-	lc_time_run tag_release
+	# lc_time_run tag_release
 
-	promote_boms xanadu
+	# promote_boms xanadu
 
 	if [[ ! $(echo "${_PRODUCT_VERSION}" | grep "q") ]] &&
 	   [[ ! $(echo "${_PRODUCT_VERSION}" | grep "7.4") ]]
@@ -105,7 +105,7 @@ function main {
 
 	lc_time_run test_boms
 
-	lc_time_run add_patcher_project_version
+	# lc_time_run add_patcher_project_version
 
 	if [ -d "${_RELEASE_ROOT_DIR}/dev/projects" ]
 	then
@@ -116,7 +116,7 @@ function main {
 
 	lc_time_run clean_portal_repository
 
-	lc_time_run prepare_next_release_branch
+	# lc_time_run prepare_next_release_branch
 
 	lc_time_run update_release_info_date
 
