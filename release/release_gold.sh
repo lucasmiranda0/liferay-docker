@@ -77,7 +77,7 @@ function commit_to_branch_and_send_pull_request {
 	gh pr create \
 		--base "${4}" \
 		--body "Created by liferay-docker/release/release_gold.sh." \
-		--head "${3}" \
+		--head "liferay-release:${3}" \
 		--repo "${5}" \
 		--title "${6}"
 
@@ -105,46 +105,50 @@ function main {
 
 	check_usage
 
-	check_supported_versions
+	# check_supported_versions
 
-	init_gcs
+	# init_gcs
 
-	lc_time_run promote_packages
+	# lc_time_run promote_packages
 
-	lc_time_run tag_release
+	# lc_time_run tag_release
 
-	promote_boms xanadu
+	# promote_boms xanadu
 
-	if [[ ! $(echo "${_PRODUCT_VERSION}" | grep "q") ]] &&
-	   [[ ! $(echo "${_PRODUCT_VERSION}" | grep "7.4") ]]
-	then
-		lc_log INFO "Do not update product_info.json for quarterly and 7.4 releases."
+	# if [[ ! $(echo "${_PRODUCT_VERSION}" | grep "q") ]] &&
+	#    [[ ! $(echo "${_PRODUCT_VERSION}" | grep "7.4") ]]
+	# then
+	# 	lc_log INFO "Do not update product_info.json for quarterly and 7.4 releases."
 
-		lc_time_run generate_product_info_json
+	# 	lc_time_run generate_product_info_json
 
-		lc_time_run upload_product_info_json
-	fi
+	# 	lc_time_run upload_product_info_json
+	# fi
 
-	lc_time_run generate_releases_json
+	# lc_time_run generate_releases_json
 
-	lc_time_run test_boms
+	# lc_time_run test_boms
 
-	lc_time_run add_patcher_project_version
+	# lc_time_run add_patcher_project_version
 
-	if [ -d "${_RELEASE_ROOT_DIR}/dev/projects" ]
-	then
-		lc_background_run clone_repository liferay-portal-ee
+	# if [ -d "${_RELEASE_ROOT_DIR}/dev/projects" ]
+	# then
+	# 	lc_background_run clone_repository liferay-portal-ee
 
-		lc_wait
-	fi
+	# 	lc_wait
+	# fi
 
-	lc_time_run clean_portal_repository
+	# lc_time_run clean_portal_repository
 
-	#lc_time_run prepare_next_release_branch
+	# #lc_time_run prepare_next_release_branch
 
-	#lc_time_run update_release_info_date
+	# #lc_time_run update_release_info_date
 
-	lc_time_run reference_new_releases
+	# _PROJECTS_DIR="/home/me/dev/projects"
+	LIFERAY_RELEASE_PRODUCT_NAME="dxp"
+	_PRODUCT_VERSION="2025.q1.0-lts"
+	LIFERAY_RELEASE_RC_BUILD_TIMESTAMP="1739837301"
+	reference_new_releases
 
 	#lc_time_run upload_to_docker_hub
 }
@@ -399,15 +403,15 @@ function reference_new_releases {
 
 	if [[ ! " ${@} " =~ " --test " ]]
 	then
-		local issue_key="$(\
-			add_jira_issue \
-				"60a3f462391e56006e6b661b" \
-				"Release Tester" \
-				"Task" \
-				"LRCI" \
-				"Add release references for ${_PRODUCT_VERSION}" \
-				"customfield_10001" \
-				"04c03e90-c5a7-4fda-82f6-65746fe08b83")"
+		# local issue_key="$(\
+		# 	add_jira_issue \
+		# 		"60a3f462391e56006e6b661b" \
+		# 		"Release Tester" \
+		# 		"Task" \
+		# 		"LRCI" \
+		# 		"Add release references for ${_PRODUCT_VERSION}" \
+		# 		"customfield_10001" \
+		# 		"04c03e90-c5a7-4fda-82f6-65746fe08b83")"
 
 		if [ "${issue_key}" == "${LIFERAY_COMMON_EXIT_CODE_BAD}" ]
 		then
@@ -421,7 +425,7 @@ function reference_new_releases {
 			"${issue_key} Add release references for ${_PRODUCT_VERSION}" \
 			"new_releases_branch" \
 			"master" \
-			"pyoo47/liferay-jenkins-ee" \
+			"kiwm/liferay-jenkins-ee" \
 			"${issue_key} Add release references for ${_PRODUCT_VERSION}."
 
 		if [ "${?}" -ne 0 ]
@@ -437,9 +441,9 @@ function reference_new_releases {
 			gh pr view liferay-release:new_releases_branch \
 				--jq ".url" \
 				--json "url" \
-				--repo "pyoo47/liferay-jenkins-ee")"
+				--repo "kiwm/liferay-jenkins-ee")"
 
-		add_jira_issue_comment "Related pull request: ${pull_request_url}" "${issue_key}"
+		# add_jira_issue_comment "Related pull request: ${pull_request_url}" "${issue_key}"
 	fi
 }
 
