@@ -181,7 +181,7 @@ function main {
 
 	for tag_name in $(cat "${TAGS_FILE_NEW}")
 	do
-		local branch_name=$(echo "${tag_name}" | sed -e "s/-.*//" -e 's@\(202[3-4]\.q[1-4]\).*@\1@')
+		local branch_name=$(echo "${tag_name}" | sed -e "s/-.*//" -e 's@\(20[0-9][0-9]\.q[1-4]\).*@\1@')
 
 		echo ""
 
