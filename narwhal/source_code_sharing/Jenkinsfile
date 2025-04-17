@@ -163,7 +163,6 @@ pipeline {
 				then
 					"${SCRIPT_PATH}/update_liferay_dxp_source_code_of_versions.sh" \
 						--logdir "${PWD}/logs/${BUILD_NUMBER}" \
-						--version "${VERSIONS_VERSION}" \
 						${ARGUMENTS}
 				fi
 				'''
