@@ -23,7 +23,8 @@ function checkout_tag {
 	trap 'return ${LIFERAY_COMMON_EXIT_CODE_BAD}' ERR
 
 	lc_cd "${BASE_DIR}/${repository}"
-
+	git branch -D 2025.q1.8
+	git tag -d 2025.q1.8
 	git reset --hard -q
 	git clean -dfqX
 
