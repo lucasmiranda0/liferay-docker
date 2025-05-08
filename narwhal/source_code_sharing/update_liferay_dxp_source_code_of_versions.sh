@@ -163,17 +163,20 @@ function main {
 
 	for tag_name in $(cat "${TAGS_FILE_NEW}")
 	do
-		echo ""
+		if ! echo "${tag_name}" | grep -q "2025.q1.8"
+		then
+			echo ""
 
-		lc_log DEBUG "Processing: ${tag_name}"
+			lc_log DEBUG "Processing: ${tag_name}"
 
-		lc_time_run lc_clone_repository liferay-portal-ee "${REPO_PATH_EE}"
+			lc_time_run lc_clone_repository liferay-portal-ee "${REPO_PATH_EE}"
 
-		lc_time_run prepare_branch_in_portal_ee "${tag_name}"
+			lc_time_run prepare_branch_in_portal_ee "${tag_name}"
 
-		lc_time_run prepare_branch_in_dxp "${tag_name}"
+			lc_time_run prepare_branch_in_dxp "${tag_name}"
 
-		rm -fr "${REPO_PATH_EE}"
+			rm -fr "${REPO_PATH_EE}"
+		fi
 	done
 }
 
