@@ -159,6 +159,8 @@ function main {
 
 	check_new_tags
 
+	lc_log INFO "New tags: $(cat ${TAGS_FILE_NEW})"
+
 	local tag_name
 
 	for tag_name in $(cat "${TAGS_FILE_NEW}")
