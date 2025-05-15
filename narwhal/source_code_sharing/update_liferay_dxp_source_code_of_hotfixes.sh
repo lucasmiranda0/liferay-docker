@@ -263,22 +263,27 @@ function get_hotfix_zip_list_file {
 	then
 		is_new_file=$(find "${zip_list_file}" -newermt "${ZIP_LIST_RETENTION_TIME} ago")
 	fi
-
+	lc_log INFO "asdf3"
 	if [ -n "${is_new_file}" ]
 	then
+		lc_log INFO "asdf3.2"
 		lc_log DEBUG "The file '${zip_list_file}' is new enough, using it."
 
 		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
 	else
+		lc_log INFO "asdf4"
 		lc_log DEBUG "Generating the zip list file: '${zip_list_file}' from '${zip_directory_url}/'."
 
 		if [[ "${release_version}" == 20* ]]
 		then
-			lc_curl "${zip_directory_url}/" - | grep -E -o "liferay-dxp-20[a-z0-9\.]+-hotfix-[0-9]{0,9}.zip" | uniq - "${zip_list_file}"
+			lc_log INFO "asdf5"
+			lc_curl "${zip_directory_url}/" - | grep -E -o "liferay-dxp-20[a-z0-9\.]+-hotfix-[0-9]{0,9}(-lts).zip" | uniq - "${zip_list_file}"
+			lc_log INFO "asdf6"
 		else
 			lc_curl "${zip_directory_url}/" - | grep -E -o "liferay-hotfix-[0-9-]+.zip" | uniq - "${zip_list_file}"
 		fi
 	fi
+	lc_log INFO "asdf7"
 }
 
 function main {
@@ -347,7 +352,12 @@ function process_version_list {
 		then
 			local zip_directory_url="https://files.liferay.com/private/ee/fix-packs/${release_version}/hotfix"
 		else
-			local zip_directory_url="https://releases.liferay.com/dxp/hotfix/${release_version}"
+			if [[ "${release_version}" == *q1* && "${release_version}" != 2023* && "${release_version}" != 2024* ]]
+			then
+				local zip_directory_url="https://releases.liferay.com/dxp/hotfix/${release_version}-lts"
+			else
+				local zip_directory_url="https://releases.liferay.com/dxp/hotfix/${release_version}"
+			fi
 		fi
 
 		lc_time_run get_hotfix_zip_list_file "${release_version}" "${zip_list_file}"
@@ -369,6 +379,8 @@ function process_zip_list_file {
 		local tag_name_new
 
 		tag_name_new="${hotfix_zip_file%.zip}"
+
+		tag_name_new="${tag_name_new%-lts}" 
 
 		if [[ ${release_version} == 7* ]]
 		then
