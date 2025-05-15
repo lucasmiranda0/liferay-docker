@@ -277,9 +277,16 @@ function get_hotfix_zip_list_file {
 
 		if [[ "${release_version}" == 20* ]]
 		then
-			lc_log INFO "asdf5"
-			lc_curl "${zip_directory_url}/" - | grep -E -o "liferay-dxp-20[a-z0-9\.]+-hotfix-[0-9]{0,9}(-lts).zip" | uniq - "${zip_list_file}"
-			lc_log INFO "asdf6"
+			if [[ "${release_version}" == *q1* && "${release_version}" != 2023* && "${release_version}" != 2024* ]]
+			then
+				lc_curl "${zip_directory_url}/" - | grep -E -o "liferay-dxp-20[a-z0-9\.]+-hotfix-[0-9]{0,9}-lts.zip" | uniq - "${zip_list_file}"
+				lc_log INFO "Release version ${release_version}: $(cat ${zip_list_file})"
+			else
+				lc_log INFO "asdf5"
+				lc_curl "${zip_directory_url}/" - | grep -E -o "liferay-dxp-20[a-z0-9\.]+-hotfix-[0-9]{0,9}.zip" | uniq - "${zip_list_file}"
+				lc_log INFO "Release version ${release_version}: $(cat ${zip_list_file})"
+				lc_log INFO "asdf6"
+			fi
 		else
 			lc_curl "${zip_directory_url}/" - | grep -E -o "liferay-hotfix-[0-9-]+.zip" | uniq - "${zip_list_file}"
 		fi
