@@ -263,6 +263,7 @@ function get_hotfix_zip_list_file {
 	then
 		is_new_file=$(find "${zip_list_file}" -newermt "${ZIP_LIST_RETENTION_TIME} ago")
 	fi
+	lc_log INFO "zip_directory_url: ${zip_directory_url}. zip_list_file ${zip_list_file}"
 	lc_log INFO "asdf3"
 	if [ -n "${is_new_file}" ]
 	then
