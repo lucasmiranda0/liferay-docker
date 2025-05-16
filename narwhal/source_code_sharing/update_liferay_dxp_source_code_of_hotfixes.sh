@@ -272,6 +272,18 @@ function get_hotfix_zip_list_file {
 
 		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
 	else
+		if [ ! -s "${zip_list_file}" ]
+		then
+			lc_log INFO "zip_list_file: ${zip_list_file} is empty"
+			lc_log INFO "zip_directory_url: ${zip_directory_url}"
+			files=($(curl -s "${zip_directory_url}/" | sed -n 's/^.*href="\([^"]*\.zip\)".*$/\1/p'))
+			lc_log INFO "File array: $(echo ${files[@]})"
+			for file in "${files[@]}"
+			do
+				lc_log INFO "file: ${file}"
+				echo "${file}" >> "${zip_list_file}"
+			done
+		fi
 		lc_log INFO "asdf4"
 		lc_log DEBUG "Generating the zip list file: '${zip_list_file}' from '${zip_directory_url}/'."
 
