@@ -54,21 +54,23 @@ function fetch_repository {
 }
 
 function run_git_maintenance {
+	lc_log INFO "rgm 1"
 	while (pgrep -f "git gc" >/dev/null)
 	do
 		sleep 1
 	done
-
+	lc_log INFO "rgm 2"
 	rm -f .git/gc.log
-
+	lc_log INFO "rgm 3"
 	git gc --quiet
-
+	lc_log INFO "rgm 4"
 	if (! git fsck --full &>/dev/null)
 	then
 		echo "Running of 'git fsck' has failed."
 
 		exit 1
 	fi
+	lc_log INFO "rgm 5"
 }
 
 function prepare_repositories {
