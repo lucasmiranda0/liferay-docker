@@ -96,7 +96,6 @@ function check_usage {
 	RUN_FETCH_REPOSITORY="true"
 	RUN_PUSH_TO_ORIGIN="true"
 	ZIP_LIST_RETENTION_TIME="1 min"
-	VERSION_INPUT="7.3.10 7.4.13 2023.q3"
 
 	while [ "$#" -gt "0" ]
 	do
@@ -128,13 +127,6 @@ function check_usage {
 
 				;;
 
-			--version)
-				VERSION_INPUT="${2}"
-
-				shift 1
-
-				;;
-
 			--no-fetch)
 				RUN_FETCH_REPOSITORY="false"
 
@@ -156,7 +148,7 @@ function check_usage {
 
 	process_argument_ignore_zip_files
 
-	process_argument_version
+	get_all_tags
 }
 
 function checkout_commit {
@@ -196,6 +188,17 @@ function copy_hotfix_commit {
 	lc_time_run push_to_origin "${tag_name_new}"
 
 	echo ""
+}
+
+function get_all_tags {
+	lc_cd "${REPO_PATH_DXP}"
+ 
+	VERSION_LIST=("7.3.10" "7.4.13")
+
+	for tag in $(git tag -l --sort=creatordate --format='%(refname:short)' "20*.q*.[0-9]" "20*.q*.[0-9][0-9]")
+	do
+		VERSION_LIST+=("${tag}")
+	done
 }
 
 function get_hotfix_properties {
@@ -339,14 +342,6 @@ function process_argument_ignore_zip_files {
 
 		touch "${IGNORE_ZIP_FILES_CACHE_FILE}"
 	fi
-}
-
-function process_argument_version {
-	local IFS=" "
-
-	read -r -a VERSION_ARRAY <<< "${VERSION_INPUT}"
-
-	VERSION_LIST=("${VERSION_ARRAY[@]}")
 }
 
 function process_version_list {
