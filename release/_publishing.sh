@@ -389,7 +389,7 @@ function _update_bundles_yml {
 			"Add ${_PRODUCT_VERSION} to bundles.yml." \
 			"update-bundles-yml-branch" \
 			"master" \
-			"brianchandotcom/liferay-docker" \
+			"lucasmiranda0/liferay-docker" \
 			"Add ${_PRODUCT_VERSION} to bundles.yml."
 
 		if [ "${?}" -eq "${LIFERAY_COMMON_EXIT_CODE_BAD}" ]

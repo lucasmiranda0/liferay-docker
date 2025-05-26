@@ -80,7 +80,7 @@ function prepare_branch_to_commit_from_master {
 
 	git checkout master
 
-	git fetch "git@github.com:liferay-release/${2}.git" master
+	git fetch "git@github.com:kiwm/${2}.git" master
 
 	git reset --hard FETCH_HEAD
 
