@@ -780,9 +780,13 @@ quarterly:
     2024.q4.3:
     2024.q4.4:
     #
+
     # LPD-48218
+
     #
+
     #2024.q4.5:
+
     #
     2024.q4.6:
     2024.q4.7:
@@ -799,6 +803,7 @@ quarterly:
     2025.q1.10-lts:
     2025.q1.11-lts:
     2025.q1.12-lts:
+    2025.q2.0:
         latest: true
 snapshot:
     snapshot-master:
