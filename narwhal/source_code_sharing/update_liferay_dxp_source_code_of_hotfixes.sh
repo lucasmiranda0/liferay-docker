@@ -97,7 +97,7 @@ function check_usage {
 	RUN_GIT_MAINTENANCE="false"
 	RUN_PUSH_TO_ORIGIN="true"
 	ZIP_LIST_RETENTION_TIME="1 min"
-	VERSION_INPUT="7.3.10 7.4.13 2023.q3"
+	VERSION_INPUT="7.3.10 7.4.13"
 
 	while [ "$#" -gt "0" ]
 	do
@@ -124,13 +124,6 @@ function check_usage {
 
 			--zip-list-retention-time)
 				ZIP_LIST_RETENTION_TIME="${2}"
-
-				shift 1
-
-				;;
-
-			--version)
-				VERSION_INPUT="${2}"
 
 				shift 1
 
@@ -377,6 +370,13 @@ function process_argument_version {
 	read -r -a VERSION_ARRAY <<< "${VERSION_INPUT}"
 
 	VERSION_LIST=("${VERSION_ARRAY[@]}")
+
+	lc_cd "${REPO_PATH_DXP}"
+
+	while IFS= read -r tag
+	do
+		VERSION_LIST+=("${tag}")
+	done < <(git tag -l --format='%(refname:short)' "20*.q*.[0-9]" "20*.q*.[0-9][0-9]")
 }
 
 function process_version_list {
@@ -384,6 +384,11 @@ function process_version_list {
 
 	for release_version in "${version_list[@]}"
 	do
+		if [ "${release_version}" == "2023.q3.5" ] || [ "${release_version}" == "2023.q4.10" ] || [ "${release_version}" == "2024.q1.17" ] || [ "${release_version}" == "2024.q4.5" ]
+		then
+			continue
+		fi
+
 		local zip_list_file="${DEDICATED_CACHE_DIR}/list-of-${release_version}.txt"
 
 		lc_log DEBUG "Processing version: ${release_version}."
