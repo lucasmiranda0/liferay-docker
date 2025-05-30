@@ -202,6 +202,11 @@ function copy_hotfix_commit {
 	local base_branch_name="${tag_name_new%%-*}"
 	local temporary_branch_name="${tag_name_new}-branch"
 
+	lc_log INFO "tag_name_base: ${tag_name_base}"
+	lc_log INFO "tag_name_new: ${tag_name_new}"
+	lc_log INFO "base_branch_name: ${base_branch_name}"
+	lc_log INFO "temporary_branch_name: ${temporary_branch_name}"
+
 	lc_time_run checkout_commit liferay-portal-ee "${commit_hash}"
 
 	if [[ "${tag_name_new}" == 20* ]]
