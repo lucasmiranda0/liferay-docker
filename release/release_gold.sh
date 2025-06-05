@@ -400,7 +400,7 @@ function reference_new_releases {
 		commit_to_branch_and_send_pull_request \
 			"${_PROJECTS_DIR}/liferay-jenkins-ee/commands/build.properties" \
 			"${issue_key} Add release references for ${_PRODUCT_VERSION}" \
-			"${issue_key}" \
+			"${_TEMP_BRANCH}" \
 			"master" \
 			"pyoo47/liferay-jenkins-ee" \
 			"${issue_key} Add release references for ${_PRODUCT_VERSION}."
@@ -413,6 +413,10 @@ function reference_new_releases {
 		else
 			lc_log INFO "Pull request with references to the next release was sent successfully."
 		fi
+
+		git checkout master
+
+		git branch -D "${_TEMP_BRANCH}"
 
 		local pull_request_url="$(\
 			gh pr view liferay-release:${issue_key} \

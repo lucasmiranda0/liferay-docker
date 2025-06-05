@@ -396,7 +396,7 @@ function _update_bundles_yml {
 		commit_to_branch_and_send_pull_request \
 			"${_PROJECTS_DIR}/liferay-docker/bundles.yml" \
 			"Add ${_PRODUCT_VERSION} to bundles.yml." \
-			"update-bundles-yml-branch" \
+			"${_TEMP_BRANCH}" \
 			"master" \
 			"brianchandotcom/liferay-docker" \
 			"Add ${_PRODUCT_VERSION} to bundles.yml."
@@ -409,6 +409,10 @@ function _update_bundles_yml {
 		else
 			lc_log INFO "The pull request was sent successfully."
 		fi
+
+		git checkout master
+
+		git -D "${_TEMP_BRANCH}"
 	fi
 }
 
