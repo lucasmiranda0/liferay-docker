@@ -62,21 +62,29 @@ function commit_to_branch_and_send_pull_request {
 
 	git commit --message "${2}"
 
-	local repository_name=$(echo "${5}" | cut -d '/' -f 2)
+	local repository_name=$(echo "${4}" | cut -d '/' -f 2)
 
-	git push --force "git@github.com:liferay-release/${repository_name}.git" "${3}"
+	git push --force "git@github.com:liferay-release/${repository_name}.git" "${_TEMP_BRANCH}"
 
 	gh pr create \
-		--base "${4}" \
+		--base "${3}" \
 		--body "Created by Release Team." \
-		--head "liferay-release:${3}" \
-		--repo "${5}" \
-		--title "${6}"
+		--head "liferay-release:${_TEMP_BRANCH}" \
+		--repo "${4}" \
+		--title "${5}"
 
 	if [ "${?}" -ne 0 ]
 	then
 		return 1
 	fi
+}
+
+function delete_temp_branch {
+	git checkout master
+
+	git branch --delete --force "${_TEMP_BRANCH}"
+
+	git push "git@github.com:liferay-release/${1}.git" --delete "${_TEMP_BRANCH}"
 }
 
 function generate_release_notes {
@@ -119,16 +127,16 @@ function prepare_branch_to_commit_from_master {
 
 	git reset --hard FETCH_HEAD
 
-	local temp_branch="temp-branch-$(date "+%Y%m%d%H%M%S")"
+	_TEMP_BRANCH="temp-branch-$(date "+%Y%m%d%H%M%S")"
 
-	git checkout -b "${temp_branch}"
+	git checkout -b "${_TEMP_BRANCH}"
 
-	if [ "$(git rev-parse --abbrev-ref HEAD)" != "${temp_branch}" ]
+	if [ "$(git rev-parse --abbrev-ref HEAD)" != "${_TEMP_BRANCH}" ]
 	then
 		return 1
 	fi
 
-	git push "git@github.com:liferay-release/${2}.git" "${temp_branch}" --force
+	git push "git@github.com:liferay-release/${2}.git" "${_TEMP_BRANCH}" --force
 }
 
 function set_git_sha {

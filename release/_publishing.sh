@@ -399,19 +399,22 @@ function _update_bundles_yml {
 		commit_to_branch_and_send_pull_request \
 			"${_PROJECTS_DIR}/liferay-docker/bundles.yml" \
 			"Add ${_PRODUCT_VERSION} to bundles.yml." \
-			"update-bundles-yml-branch" \
 			"master" \
 			"brianchandotcom/liferay-docker" \
 			"Add ${_PRODUCT_VERSION} to bundles.yml."
 
-		if [ "${?}" -eq "${LIFERAY_COMMON_EXIT_CODE_BAD}" ]
+		local exit_code="${?}"
+
+		if [ "${exit_code}" -eq "${LIFERAY_COMMON_EXIT_CODE_BAD}" ]
 		then
 			lc_log ERROR "Unable to send pull request to brianchandotcom/liferay-docker."
-
-			return "${LIFERAY_COMMON_EXIT_CODE_BAD}"
 		else
 			lc_log INFO "The pull request was sent successfully."
 		fi
+
+		delete_temp_branch "liferay-docker"
+
+		return "${exit_code}"
 	fi
 }
 
