@@ -5,6 +5,7 @@ source ./_test_common.sh
 
 function main {
 	test_release_common_get_product_group_version
+	test_release_common_get_release_patch_version
 	test_release_common_get_release_quarter
 	test_release_common_get_release_version
 	test_release_common_get_release_version_trivial
@@ -15,10 +16,12 @@ function main {
 	test_release_common_is_7_4_ga_release
 	test_release_common_is_7_4_release
 	test_release_common_is_7_4_u_release
+	test_release_common_is_dxp_release
 	test_release_common_is_early_product_version_than
 	test_release_common_is_ga_release
 	test_release_common_is_lts_release
 	test_release_common_is_nightly_release
+	test_release_common_is_portal_release
 	test_release_common_is_quarterly_release
 	test_release_common_is_u_release
 
@@ -29,6 +32,13 @@ function main {
 function test_release_common_get_product_group_version {
 	_test_release_common_get_product_group_version "2025.q1.0-lts" "2025.q1"
 	_test_release_common_get_product_group_version "7.4.13.nightly" "7.4"
+}
+
+function test_release_common_get_release_patch_version {
+	_test_release_common_get_release_patch_version "2023.q4.3" "3"
+	_test_release_common_get_release_patch_version "2024.q3.7" "7"
+	_test_release_common_get_release_patch_version "2025.q1.13-lts" "13"
+	_test_release_common_get_release_patch_version "2025.q2.0" "0"
 }
 
 function test_release_common_get_release_quarter {
@@ -101,6 +111,11 @@ function test_release_common_is_7_4_u_release {
 	_test_release_common_is_7_4_u_release "7.4.13-u134" "0"
 }
 
+function test_release_common_is_dxp_release {
+	_test_release_common_is_dxp_release "dxp" "0"
+	_test_release_common_is_dxp_release "portal" "1"
+}
+
 function test_release_common_is_early_product_version_than {
 	_test_release_common_is_early_product_version_than "2023.q3.3" "2025.q2.0" "0"
 	_test_release_common_is_early_product_version_than "2024.q4.7" "2025.q1.0" "0"
@@ -130,6 +145,11 @@ function test_release_common_is_nightly_release {
 	_test_release_common_is_nightly_release "7.4.3.132-ga132" "1"
 }
 
+function test_release_common_is_portal_release {
+	_test_release_common_is_portal_release "dxp" "1"
+	_test_release_common_is_portal_release "portal" "0"
+}
+
 function test_release_common_is_quarterly_release {
 	_test_release_common_is_quarterly_release "2025.q1.0-lts" "0"
 	_test_release_common_is_quarterly_release "7.4.13-u134" "1"
@@ -149,6 +169,14 @@ function _test_release_common_get_product_group_version {
 	echo -e "Running _test_release_common_get_product_group_version for ${_PRODUCT_VERSION}.\n"
 
 	assert_equals "$(get_product_group_version)" "${2}"
+}
+
+function _test_release_common_get_release_patch_version {
+	_PRODUCT_VERSION="${1}"
+
+	echo -e "Running _test_release_common_get_release_patch_version for ${_PRODUCT_VERSION}.\n"
+
+	assert_equals "$(get_release_patch_version)" "${2}"
 }
 
 function _test_release_common_get_release_quarter {
@@ -223,6 +251,16 @@ function _test_release_common_is_7_4_u_release {
 	assert_equals "${?}" "${2}"
 }
 
+function _test_release_common_is_dxp_release {
+	LIFERAY_RELEASE_PRODUCT_NAME="${1}"
+
+	echo -e "Running _test_release_common_is_dxp_release for ${LIFERAY_RELEASE_PRODUCT_NAME}.\n"
+
+	is_dxp_release
+
+	assert_equals "${?}" "${2}"
+}
+
 function _test_release_common_is_early_product_version_than {
 	_PRODUCT_VERSION="${1}"
 
@@ -253,6 +291,16 @@ function _test_release_common_is_nightly_release {
 	echo -e "Running _test_release_common_is_nightly_release for ${1}.\n"
 
 	is_nightly_release "${1}"
+
+	assert_equals "${?}" "${2}"
+}
+
+function _test_release_common_is_portal_release {
+	LIFERAY_RELEASE_PRODUCT_NAME="${1}"
+
+	echo -e "Running _test_release_common_is_portal_release for ${LIFERAY_RELEASE_PRODUCT_NAME}.\n"
+
+	is_portal_release
 
 	assert_equals "${?}" "${2}"
 }

@@ -57,8 +57,38 @@ function clone_repository {
 	git remote --verbose
 }
 
+function commit_to_branch_and_send_pull_request {
+	git add "${1}"
+
+	git commit --message "${2}"
+
+	local repository_name=$(echo "${4}" | cut -d '/' -f 2)
+
+	git push --force "git@github.com:kiwm/${repository_name}.git" "${_TEMP_BRANCH}"
+
+	gh pr create \
+		--base "${3}" \
+		--body "Created by Release Team." \
+		--head "kiwm:${_TEMP_BRANCH}" \
+		--repo "${4}" \
+		--title "${5}"
+
+	if [ "${?}" -ne 0 ]
+	then
+		return 1
+	fi
+}
+
+function delete_temp_branch {
+	git checkout master
+
+	git branch --delete --force "${_TEMP_BRANCH}"
+
+	git push "git@github.com:liferay-release/${1}.git" --delete "${_TEMP_BRANCH}"
+}
+
 function generate_release_notes {
-	if [ "${LIFERAY_RELEASE_PRODUCT_NAME}" == "portal" ]
+	if is_portal_release
 	then
 		lc_log INFO "The product is set to \"portal.\""
 
@@ -67,7 +97,7 @@ function generate_release_notes {
 
 	local ga_version=7.4.13-ga1
 
-	if (! is_quarterly_release)
+	if ! is_quarterly_release
 	then
 		ga_version=${_PRODUCT_VERSION%%-u*}-ga1
 	fi
@@ -86,6 +116,36 @@ function generate_release_notes {
 		grep -v POSHI | \
 		grep -v RELEASE | \
 		paste -sd, > "${_BUILD_DIR}/release/release-notes.txt"
+}
+
+function prepare_branch_to_commit {
+	lc_cd "${1}"
+
+	git restore .
+
+	git checkout master
+
+	local base_branch="master"
+
+	if [ -n "${3}" ]
+	then
+		base_branch="${3}"
+	fi
+
+	local repository_name="${2}"
+
+	git fetch --no-tags "git@github.com:kiwm/${repository_name}.git" "${base_branch}"
+
+	git reset --hard FETCH_HEAD
+
+	_TEMP_BRANCH="temp-branch-$(date "+%Y%m%d%H%M%S")"
+
+	git checkout -b "${_TEMP_BRANCH}" "${base_branch}"
+
+	if [ "$(git rev-parse --abbrev-ref HEAD)" != "${_TEMP_BRANCH}" ]
+	then
+		return "${LIFERAY_COMMON_EXIT_CODE_BAD}"
+	fi
 }
 
 function set_git_sha {
@@ -164,7 +224,7 @@ function update_portal_repository {
 function update_release_tool_repository {
 	trap 'return ${LIFERAY_COMMON_EXIT_CODE_BAD}' ERR
 
-	if [ "${LIFERAY_RELEASE_PRODUCT_NAME}" == "portal" ]
+	if is_portal_release
 	then
 		lc_log INFO "The product is set to \"portal.\""
 
