@@ -58,7 +58,7 @@ function clone_repository {
 }
 
 function generate_release_notes {
-	if [ "${LIFERAY_RELEASE_PRODUCT_NAME}" == "portal" ]
+	if is_portal_release
 	then
 		lc_log INFO "The product is set to \"portal.\""
 
@@ -67,7 +67,7 @@ function generate_release_notes {
 
 	local ga_version=7.4.13-ga1
 
-	if (! is_quarterly_release)
+	if ! is_quarterly_release
 	then
 		ga_version=${_PRODUCT_VERSION%%-u*}-ga1
 	fi
@@ -164,7 +164,7 @@ function update_portal_repository {
 function update_release_tool_repository {
 	trap 'return ${LIFERAY_COMMON_EXIT_CODE_BAD}' ERR
 
-	if [ "${LIFERAY_RELEASE_PRODUCT_NAME}" == "portal" ]
+	if is_portal_release
 	then
 		lc_log INFO "The product is set to \"portal.\""
 

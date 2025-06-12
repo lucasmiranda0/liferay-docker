@@ -94,9 +94,10 @@ function check_usage {
 	REPO_PATH_DXP="${BASE_DIR}/liferay-dxp"
 	REPO_PATH_EE="${BASE_DIR}/liferay-portal-ee"
 	RUN_FETCH_REPOSITORY="true"
+	RUN_GIT_MAINTENANCE="false"
 	RUN_PUSH_TO_ORIGIN="true"
 	ZIP_LIST_RETENTION_TIME="1 min"
-	VERSION_INPUT="7.3.10 7.4.13 2023.q3"
+	VERSION_INPUT="7.3.10 7.4.13"
 
 	while [ "$#" -gt "0" ]
 	do
@@ -123,13 +124,6 @@ function check_usage {
 
 			--zip-list-retention-time)
 				ZIP_LIST_RETENTION_TIME="${2}"
-
-				shift 1
-
-				;;
-
-			--version)
-				VERSION_INPUT="${2}"
 
 				shift 1
 
@@ -178,22 +172,46 @@ function checkout_commit {
 	fi
 }
 
+function checkout_hotfix_tag {
+	local base_branch_name="${3}"
+	local repository="${1}"
+	local temporary_branch_name="${2}"
+
+	trap 'return ${LIFERAY_COMMON_EXIT_CODE_BAD}' ERR
+
+	lc_cd "${BASE_DIR}/${repository}"
+
+	git reset --hard -q
+
+	git clean -dfqX
+
+	git checkout -b "${temporary_branch_name}" -q "${base_branch_name}"
+}
+
 function copy_hotfix_commit {
 	local commit_hash="${1}"
 	local tag_name_base="${2}"
 	local tag_name_new="${3}"
 
+	local base_branch_name=$(echo "${tag_name_new}" | cut -d '-' -f 1)
+	local temporary_branch_name="${tag_name_new}-branch"
+
 	lc_time_run checkout_commit liferay-portal-ee "${commit_hash}"
 
-	lc_time_run checkout_tag liferay-dxp "${tag_name_base}"
-
-	lc_time_run run_git_maintenance
+	if [[ "${tag_name_new}" == 20* ]]
+	then
+		lc_time_run checkout_hotfix_tag liferay-dxp "${temporary_branch_name}" "${base_branch_name}"
+	else
+		lc_time_run checkout_tag liferay-dxp "${tag_name_base}"
+	fi
 
 	lc_time_run run_rsync
 
 	lc_time_run commit_and_tag "${tag_name_new}"
 
-	lc_time_run push_to_origin "${tag_name_new}"
+	lc_time_run push_to_origin "${tag_name_new}" "${temporary_branch_name}"
+
+	RUN_GIT_MAINTENANCE="true"
 
 	echo ""
 }
@@ -270,16 +288,28 @@ function get_hotfix_zip_list_file {
 
 		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
 	else
+		if [ ! -s "${zip_list_file}" ]
+		then
+			files=($(curl -s "${zip_directory_url}/" | sed -n 's/^.*href="\([^"]*\.zip\)".*$/\1/p'))
+
+			for file in "${files[@]}"
+			do
+				echo "${file}" >> "${zip_list_file}"
+			done
+		fi
+
 		lc_log DEBUG "Generating the zip list file: '${zip_list_file}' from '${zip_directory_url}/'."
 
 		if [[ "${release_version}" == 20* ]]
 		then
-			local zip_directory_name
-
-			for zip_directory_name in $(lc_curl "${zip_directory_url}/" - | grep -E -o "20[0-9]+\.q[0-9]\.[0-9]+" | uniq)
-			do
-				lc_curl "${zip_directory_url}/${zip_directory_name}/" - | grep -E -o "liferay-dxp-20[a-z0-9\.]+-hotfix-[0-9]{0,9}.zip" | sed "s@^@${zip_directory_name}/@"
-			done | uniq - "${zip_list_file}"
+			if [[ "${release_version}" == *q1* ]] &&
+			   [[ "${release_version}" != 2023* ]] &&
+			   [[ "${release_version}" != 2024* ]]
+			then
+				lc_curl "${zip_directory_url}/" - | grep -E -o "liferay-dxp-20[a-z0-9\.]+-lts-hotfix-[0-9]{0,9}.zip" | uniq - "${zip_list_file}"
+			else
+				lc_curl "${zip_directory_url}/" - | grep -E -o "liferay-dxp-20[a-z0-9\.]+-hotfix-[0-9]{0,9}.zip" | uniq - "${zip_list_file}"
+			fi
 		else
 			lc_curl "${zip_directory_url}/" - | grep -E -o "liferay-hotfix-[0-9-]+.zip" | uniq - "${zip_list_file}"
 		fi
@@ -337,6 +367,49 @@ function process_argument_version {
 	read -r -a VERSION_ARRAY <<< "${VERSION_INPUT}"
 
 	VERSION_LIST=("${VERSION_ARRAY[@]}")
+
+	lc_cd "${REPO_PATH_DXP}"
+
+	while IFS= read -r tag
+	do
+		VERSION_LIST+=("${tag}")
+	done < <(git tag -l --format='%(refname:short)' "20*.q*.[0-9]" "20*.q*.[0-9][0-9]")
+
+	for release_version in "${VERSION_LIST[@]}"
+	do
+		if [[ ${release_version} == 7* ]]
+		then
+			local zip_directory_url="https://files.liferay.com/private/ee/fix-packs/${release_version}/hotfix"
+		else
+			if [[ "${release_version}" == *q1* ]] &&
+			   [[ "${release_version}" != 2023* ]] &&
+			   [[ "${release_version}" != 2024* ]]
+			then
+				local zip_directory_url="https://releases.liferay.com/dxp/hotfix/${release_version}-lts"
+			else
+				local zip_directory_url="https://releases.liferay.com/dxp/hotfix/${release_version}"
+			fi
+		fi
+
+		curl --head --silent --fail "${zip_directory_url}" > /dev/null
+
+		if [ $? -ne 0 ]
+		then
+			VERSION_LIST=( "${VERSION_LIST[@]/$release_version}" )
+		fi
+	done
+
+	temporary_version_list=()
+
+	for version in "${VERSION_LIST[@]}"
+	do
+		if [ -n "${version}" ]
+		then
+			temporary_version_list+=("${version}")
+		fi
+	done
+
+	VERSION_LIST=("${temporary_version_list[@]}")
 }
 
 function process_version_list {
@@ -352,13 +425,25 @@ function process_version_list {
 		then
 			local zip_directory_url="https://files.liferay.com/private/ee/fix-packs/${release_version}/hotfix"
 		else
-			local zip_directory_url="https://releases.liferay.com/dxp/hotfix"
+			if [[ "${release_version}" == *q1* ]] &&
+			   [[ "${release_version}" != 2023* ]] &&
+			   [[ "${release_version}" != 2024* ]]
+			then
+				local zip_directory_url="https://releases.liferay.com/dxp/hotfix/${release_version}-lts"
+			else
+				local zip_directory_url="https://releases.liferay.com/dxp/hotfix/${release_version}"
+			fi
 		fi
 
 		lc_time_run get_hotfix_zip_list_file "${release_version}" "${zip_list_file}"
 
 		process_zip_list_file "${zip_list_file}" "${release_version}"
 	done
+
+	if [ "${RUN_GIT_MAINTENANCE}" == "true" ]
+	then
+		lc_time_run run_git_maintenance
+	fi
 }
 
 function process_zip_list_file {
@@ -374,6 +459,8 @@ function process_zip_list_file {
 		local tag_name_new
 
 		tag_name_new="${hotfix_zip_file%.zip}"
+
+		tag_name_new="${tag_name_new//-lts/}"
 
 		if [[ ${release_version} == 7* ]]
 		then

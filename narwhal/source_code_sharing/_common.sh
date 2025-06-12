@@ -4,7 +4,7 @@
 
 set -o pipefail
 
-source ../../_liferay_common.sh
+source "$(dirname "$(dirname "$(dirname "$(readlink /proc/$$/fd/255 2>/dev/null)")")")/_liferay_common.sh"
 
 export BASE_DIR="${PWD}"
 
@@ -49,6 +49,8 @@ function fetch_repository {
 	lc_cd "${BASE_DIR}/${1}"
 
 	git fetch --all --force --tags
+
+	git config --add checkout.defaultRemote origin
 }
 
 function run_git_maintenance {
@@ -72,11 +74,19 @@ function run_git_maintenance {
 function prepare_repositories {
 	lc_time_run lc_clone_repository liferay-dxp
 
+	lc_cd "${BASE_DIR}"
+
 	lc_time_run lc_clone_repository liferay-portal-ee
+
+	lc_cd "${BASE_DIR}"
 
 	lc_time_run fetch_repository liferay-dxp
 
+	lc_cd "${BASE_DIR}"
+
 	lc_time_run fetch_repository liferay-portal-ee
+
+	lc_cd "${BASE_DIR}"
 }
 
 function push_to_origin {
@@ -88,6 +98,13 @@ function push_to_origin {
 	lc_cd "${REPO_PATH_DXP}"
 
 	git push -q origin "${1}"
+
+	if [[ "${2}" == 20* ]]
+	then
+		git checkout master
+
+		git branch --delete "${2}"
+	fi
 }
 
 function run_rsync {

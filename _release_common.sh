@@ -1,21 +1,22 @@
 #!/bin/bash
 
 function get_product_group_version {
-	if [ -n "${_PRODUCT_VERSION}" ]
+	echo "$(_get_product_version "${1}")" | cut -d '.' -f 1,2
+}
+
+function get_release_patch_version {
+	local product_version="$(_get_product_version "${1}")"
+
+	if is_lts_release "${product_version}"
 	then
-		echo "${_PRODUCT_VERSION}" | cut -d '.' -f 1,2
+		echo "${product_version}" | cut -d '.' -f 3 | sed -e "s/-lts//"
 	else
-		echo "${1}" | cut -d '.' -f 1,2
+		echo "${product_version}" | cut -d '.' -f 3
 	fi
 }
 
 function get_release_quarter {
-	if [ -n "${_PRODUCT_VERSION}" ]
-	then
-		echo "${_PRODUCT_VERSION}" | cut -d '.' -f 2 | tr -d 'q'
-	else
-		echo "${1}" | cut -d '.' -f 2 | tr -d 'q'
-	fi
+	echo "$(_get_product_version "${1}")" | cut -d '.' -f 2 | tr -d 'q'
 }
 
 function get_release_version {
@@ -48,12 +49,7 @@ function get_release_version_trivial {
 }
 
 function get_release_year {
-	if [ -n "${_PRODUCT_VERSION}" ]
-	then
-		echo "${_PRODUCT_VERSION}" | cut -d '.' -f 1
-	else
-		echo "${1}" | cut -d '.' -f 1
-	fi
+	echo "$(_get_product_version "${1}")" | cut -d '.' -f 1
 }
 
 function is_7_3_ga_release {
@@ -103,6 +99,15 @@ function is_7_4_release {
 
 function is_7_4_u_release {
 	if [[ "$(_get_product_version "${1}")" == 7.4.*-u* ]]
+	then
+		return 0
+	fi
+
+	return 1
+}
+
+function is_dxp_release {
+	if [ "${LIFERAY_RELEASE_PRODUCT_NAME}" == "dxp" ]
 	then
 		return 0
 	fi
@@ -182,6 +187,15 @@ function is_lts_release {
 
 function is_nightly_release {
 	if [[ "$(_get_product_version "${1}")" == *nightly ]]
+	then
+		return 0
+	fi
+
+	return 1
+}
+
+function is_portal_release {
+	if [ "${LIFERAY_RELEASE_PRODUCT_NAME}" == "portal" ]
 	then
 		return 0
 	fi

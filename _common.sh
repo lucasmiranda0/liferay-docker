@@ -326,6 +326,7 @@ function test_docker_image {
 }
 
 function warm_up_tomcat {
+	rm -fr "${_BUNDLES_DIR}/data/elasticsearch7"
 
 	#
 	# Warm up Tomcat for older versions to speed up starting Tomcat. Populating
