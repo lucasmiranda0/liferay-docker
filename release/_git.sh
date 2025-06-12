@@ -64,12 +64,12 @@ function commit_to_branch_and_send_pull_request {
 
 	local repository_name=$(echo "${4}" | cut -d '/' -f 2)
 
-	git push --force "git@github.com:liferay-release/${repository_name}.git" "${_TEMP_BRANCH}"
+	git push --force "git@github.com:kiwm/${repository_name}.git" "${_TEMP_BRANCH}"
 
 	gh pr create \
 		--base "${3}" \
 		--body "Created by Release Team." \
-		--head "liferay-release:${_TEMP_BRANCH}" \
+		--head "kiwm:${_TEMP_BRANCH}" \
 		--repo "${4}" \
 		--title "${5}"
 
@@ -134,7 +134,7 @@ function prepare_branch_to_commit {
 
 	local repository_name="${2}"
 
-	git fetch --no-tags "git@github.com:liferay-release/${repository_name}.git" "${base_branch}"
+	git fetch --no-tags "git@github.com:kiwm/${repository_name}.git" "${base_branch}"
 
 	git reset --hard FETCH_HEAD
 

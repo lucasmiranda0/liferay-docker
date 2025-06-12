@@ -83,48 +83,10 @@ function main {
 	fi
 
 	check_usage
+	_PROJECTS_DIR="/home/me/dev/projects"
+	LIFERAY_RELEASE_VERSION=2025.q2.2
+	lc_time_run upload_to_docker_hub
 
-	check_supported_versions
-
-	init_gcs
-
-	lc_time_run promote_packages
-
-	lc_time_run tag_release
-
-	promote_boms xanadu
-
-	if (! is_quarterly_release && ! is_7_4_release)
-	then
-		lc_log INFO "Do not update product_info.json for quarterly and 7.4 releases."
-
-		lc_time_run generate_product_info_json
-
-		lc_time_run upload_product_info_json
-	fi
-
-	lc_time_run generate_releases_json
-
-	lc_time_run test_boms
-
-	lc_time_run reference_new_releases
-
-	lc_time_run add_patcher_project_version
-
-	#if [ -d "${_RELEASE_ROOT_DIR}/dev/projects" ]
-	#then
-	#	lc_background_run clone_repository liferay-portal-ee
-
-	#	lc_wait
-	#fi
-
-	#lc_time_run clean_portal_repository
-
-	#lc_time_run prepare_next_release_branch
-
-	#lc_time_run update_release_info_date
-
-	#lc_time_run upload_to_docker_hub
 }
 
 function prepare_next_release_branch {
