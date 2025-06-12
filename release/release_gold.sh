@@ -89,12 +89,12 @@ function commit_to_branch_and_send_pull_request {
 }
 
 function get_tag_name {
-	if [ "${LIFERAY_RELEASE_PRODUCT_NAME}" == "dxp" ]
-	then
-		echo "${_ARTIFACT_VERSION}"
-	elif [ "${LIFERAY_RELEASE_PRODUCT_NAME}" == "portal" ]
+	if (is_ga_release || is_u_release)
 	then
 		echo "${_PRODUCT_VERSION}"
+	elif is_quarterly_release
+	then
+		echo "${_ARTIFACT_VERSION}"
 	fi
 }
 
@@ -129,22 +129,22 @@ function main {
 
 	lc_time_run test_boms
 
+	lc_time_run reference_new_releases
+
 	lc_time_run add_patcher_project_version
 
-	if [ -d "${_RELEASE_ROOT_DIR}/dev/projects" ]
-	then
-		lc_background_run clone_repository liferay-portal-ee
+	#if [ -d "${_RELEASE_ROOT_DIR}/dev/projects" ]
+	#then
+	#	lc_background_run clone_repository liferay-portal-ee
 
-		lc_wait
-	fi
+	#	lc_wait
+	#fi
 
-	lc_time_run clean_portal_repository
+	#lc_time_run clean_portal_repository
 
 	#lc_time_run prepare_next_release_branch
 
 	#lc_time_run update_release_info_date
-
-	lc_time_run reference_new_releases
 
 	#lc_time_run upload_to_docker_hub
 }
@@ -232,31 +232,31 @@ function prepare_next_release_branch {
 
 		return "${LIFERAY_COMMON_EXIT_CODE_BAD}"
 	else
-		local next_project_version_suffix="$(echo "${_PRODUCT_VERSION}" | cut -d '.' -f 3)"
+		local next_release_patch_version=$(get_release_patch_version)
 
-		next_project_version_suffix=$((next_project_version_suffix + 1))
+		next_release_patch_version=$((next_release_patch_version + 1))
 
 		if [[ "${_PRODUCT_VERSION}" == *q1* ]]
 		then
 			if [[ "$(get_release_year)" -ge 2025 ]]
 			then
-				next_project_version_suffix="${next_project_version_suffix} LTS"
+				next_release_patch_version="${next_release_patch_version} LTS"
 			fi
 		fi
 
 		sed -i \
-			-e "s/release.info.version.display.name\[master-private\]=.*/release.info.version.display.name[master-private]=${product_group_version^^}.${next_project_version_suffix}/" \
+			-e "s/release.info.version.display.name\[master-private\]=.*/release.info.version.display.name[master-private]=${product_group_version^^}.${next_release_patch_version}/" \
 			"${_PROJECTS_DIR}/liferay-portal-ee/release.properties"
 
 		sed -i \
-			-e "s/release.info.version.display.name\[release-private\]=.*/release.info.version.display.name[release-private]=${product_group_version^^}.${next_project_version_suffix}/" \
+			-e "s/release.info.version.display.name\[release-private\]=.*/release.info.version.display.name[release-private]=${product_group_version^^}.${next_release_patch_version}/" \
 			"${_PROJECTS_DIR}/liferay-portal-ee/release.properties"
 
 		if [ -z "${LIFERAY_RELEASE_TEST_MODE}" ]
 		then
 			commit_to_branch_and_send_pull_request \
 				"${_PROJECTS_DIR}/liferay-portal-ee/release.properties" \
-				"Prepare ${product_group_version}.${next_project_version_suffix}" \
+				"Prepare ${product_group_version}.${next_release_patch_version}" \
 				"${quarterly_release_branch}" \
 				"${quarterly_release_branch}" \
 				"brianchandotcom/liferay-portal-ee" \
@@ -501,7 +501,7 @@ function tag_release {
 
 	local repository=liferay-portal-ee
 
-	if [ "${LIFERAY_RELEASE_PRODUCT_NAME}" == "portal" ]
+	if is_portal_release
 	then
 		repository=liferay-portal
 	fi
@@ -618,7 +618,7 @@ function test_boms {
 function update_release_info_date {
 	if ! is_quarterly_release ||
 	   [ ! $(echo "${LIFERAY_RELEASE_PREPARE_NEXT_RELEASE_BRANCH}" | grep -i "true") ] ||
-	   [[ "$(echo "${_PRODUCT_VERSION}" | cut -d '.' -f 3)" -eq 0 ]] ||
+	   [[ "$(get_release_patch_version)" -eq 0 ]] ||
 	   [[ "$(get_release_year)" -lt 2024 ]]
 	then
 		lc_log INFO "Skipping the release info update."

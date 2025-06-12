@@ -22,50 +22,56 @@ function generate_checksum_files {
 }
 
 function generate_javadocs {
-	if ! is_7_3_ga_release &&
-	   ! is_7_3_u_release &&
-	   ! is_7_4_ga_release
+	if is_7_4_u_release
 	then
 		lc_log INFO "Javadocs should not be generated for ${_PRODUCT_VERSION}."
 
 		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
 	fi
 
-	lc_log INFO "Generating javadocs for ${_PRODUCT_VERSION}."
-
-	git reset --hard && git clean -dfx
-
-	git fetch --no-tags upstream "refs/tags/${_PRODUCT_VERSION}:refs/tags/${_PRODUCT_VERSION}"
-
-	git checkout "tags/${_PRODUCT_VERSION}"
-
-	local portal_release_edition_private="true"
-
-	if [ "${LIFERAY_RELEASE_PRODUCT_NAME}" == "portal" ]
+	if is_quarterly_release
 	then
-		portal_release_edition_private="false"
+		if is_early_product_version_than "2025.q3.0" || [[ "$(get_release_patch_version)" -ne 0 ]]
+		then
+			lc_log INFO "Javadocs should not be generated for ${_PRODUCT_VERSION}."
+
+			return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+		fi
 	fi
 
-	local release_info_version="$(echo "${_PRODUCT_VERSION}" | cut -d '-' -f 1)"
-	local service_pack_version_suffix="-$(echo "${_PRODUCT_VERSION}" | cut -d '-' -f 2)"
-
-	ant \
-		-Ddist.dir="${_BUILD_DIR}/release" \
-		-Dliferay.product.name="liferay-${LIFERAY_RELEASE_PRODUCT_NAME}" \
-		-Dlp.version="${_PRODUCT_VERSION}" \
-		-Dpatch.doc="true" \
-		-Dportal.dir="${_PROJECTS_DIR}/liferay-portal-ee" \
-		-Dportal.release.edition.private="${portal_release_edition_private}" \
-		-Drelease.info.version="${release_info_version}" \
-		-Dservice.pack.version.suffix="${service_pack_version_suffix}" \
-		-Dtstamp.value="${_BUILD_TIMESTAMP}" \
-		-f "${_PROJECTS_DIR}/liferay-release-tool-ee/build-service-pack.xml" patch-doc
-
-	if [ "${?}" -ne 0 ]
+	if [ -z "${LIFERAY_RELEASE_TEST_MODE}" ]
 	then
-		lc_log ERROR "Unable to generate javadocs."
+		lc_log INFO "Generating javadocs for ${_PRODUCT_VERSION}."
 
-		return "${LIFERAY_COMMON_EXIT_CODE_BAD}"
+		git reset --hard && git clean -dfx
+
+		git fetch --no-tags upstream "refs/tags/${_PRODUCT_VERSION}:refs/tags/${_PRODUCT_VERSION}"
+
+		git checkout "tags/${_PRODUCT_VERSION}"
+
+		local portal_release_edition_private="true"
+
+		if is_portal_release
+		then
+			portal_release_edition_private="false"
+		fi
+
+		ant \
+			-Ddist.dir="${_BUILD_DIR}/release" \
+			-Dliferay.product.name="liferay-${LIFERAY_RELEASE_PRODUCT_NAME}" \
+			-Dlp.version="${_PRODUCT_VERSION}" \
+			-Dpatch.doc="true" \
+			-Dportal.dir="${_PROJECTS_DIR}/liferay-portal-ee" \
+			-Dportal.release.edition.private="${portal_release_edition_private}" \
+			-Dtstamp.value="${_BUILD_TIMESTAMP}" \
+			-f "${_PROJECTS_DIR}/liferay-release-tool-ee/build-service-pack.xml" patch-doc
+
+		if [ "${?}" -ne 0 ]
+		then
+			lc_log ERROR "Unable to generate javadocs."
+
+			return "${LIFERAY_COMMON_EXIT_CODE_BAD}"
+		fi
 	fi
 }
 
@@ -86,17 +92,17 @@ function generate_release_properties_file {
 	local product_version="${_PRODUCT_VERSION^^}"
 	local target_platform_version="${_PRODUCT_VERSION}"
 
-	if [ "${LIFERAY_RELEASE_PRODUCT_NAME}" == "dxp" ]
+	if is_dxp_release
 	then
 		product_version="DXP ${product_version}"
 		target_platform_version=$(echo "${target_platform_version}" | sed -r 's/-u/.u/')
 
-		if [[ "${_PRODUCT_VERSION}" == *"-lts" ]]
+		if is_lts_release
 		then
 			target_platform_version=$(echo "${target_platform_version}" | sed -r 's/-lts//g')
 		fi
 
-	elif [ "${LIFERAY_RELEASE_PRODUCT_NAME}" == "portal" ]
+	elif is_portal_release
 	then
 		product_version="Portal ${product_version}"
 		target_platform_version=$(echo "${_PRODUCT_VERSION}" | cut -d '-' -f 1)
@@ -120,7 +126,7 @@ function generate_release_properties_file {
 }
 
 function install_patching_tool {
-	if [ "${LIFERAY_RELEASE_PRODUCT_NAME}" == "portal" ]
+	if is_portal_release
 	then
 		lc_log INFO "Patching Tool should not be installed."
 
@@ -245,7 +251,7 @@ function package_portal_dependencies {
 }
 
 function package_release {
-	if [ "${LIFERAY_RELEASE_PRODUCT_NAME}" == "portal" ]
+	if is_portal_release
 	then
 		rm -fr "${_BUNDLES_DIR}/routes/default/dxp"
 	fi
