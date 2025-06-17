@@ -139,7 +139,7 @@ function prepare_branch_to_commit {
 
 	_TEMP_BRANCH="temp-branch-$(date "+%Y%m%d%H%M%S")"
 
-	git fetch --no-tags "git@github.com:liferay/${repository_name}.git" "${base_branch}:${_TEMP_BRANCH}"
+	git fetch --no-tags "git@github.com:kiwm/${repository_name}.git" "pull-request-34-LPD-56233:${_TEMP_BRANCH}"
 
 	git checkout "${_TEMP_BRANCH}"
 

@@ -334,7 +334,7 @@ function upload_to_docker_hub {
 
 	_update_bundles_yml
 
-	LIFERAY_DOCKER_IMAGE_FILTER="${_PRODUCT_VERSION}" ./build_all_images.sh --push
+	LIFERAY_DOCKER_IMAGE_FILTER="${_PRODUCT_VERSION}" ./build_all_images.sh
 
 	local exit_code="${?}"
 
@@ -406,7 +406,7 @@ function _update_bundles_yml {
 			"${_PROJECTS_DIR}/liferay-docker/bundles.yml" \
 			"Add ${_PRODUCT_VERSION} to bundles.yml." \
 			"master" \
-			"brianchandotcom/liferay-docker" \
+			"lucasmiranda0/liferay-docker" \
 			"Add ${_PRODUCT_VERSION} to bundles.yml."
 
 		if [ "${?}" -eq "${LIFERAY_COMMON_EXIT_CODE_BAD}" ]
