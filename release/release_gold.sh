@@ -88,26 +88,26 @@ function main {
 
 	init_gcs
 
-	lc_time_run promote_packages
+	# lc_time_run promote_packages
 
-	lc_time_run tag_release
+	# lc_time_run tag_release
 
-	promote_boms xanadu
+	# promote_boms xanadu
 
-	if (! is_quarterly_release && ! is_7_4_release)
-	then
-		lc_log INFO "Do not update product_info.json for quarterly and 7.4 releases."
+	# if (! is_quarterly_release && ! is_7_4_release)
+	# then
+	# 	lc_log INFO "Do not update product_info.json for quarterly and 7.4 releases."
 
-		lc_time_run generate_product_info_json
+	# 	lc_time_run generate_product_info_json
 
-		lc_time_run upload_product_info_json
-	fi
+	# 	lc_time_run upload_product_info_json
+	# fi
 
-	lc_time_run generate_releases_json
+	# lc_time_run generate_releases_json
 
-	lc_time_run test_boms
+	# lc_time_run test_boms
 
-	lc_time_run reference_new_releases
+	# lc_time_run reference_new_releases
 
 	lc_time_run add_patcher_project_version
 
