@@ -186,7 +186,7 @@ function download_trial_dxp_license {
 }
 
 function get_latest_tomcat_version {
-	local latest_tomcat_version="9.0.104"
+	local latest_tomcat_version="9.0.105"
 
 	latest_tomcat_version=$(\
 		echo -e "${latest_tomcat_version}\n${1}" | \

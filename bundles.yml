@@ -802,6 +802,7 @@ quarterly:
     2025.q1.9-lts:
     2025.q1.10-lts:
     2025.q1.11-lts:
+        latest: true
     2025.q1.12-lts:
     2025.q1.13-lts:
     2025.q1.14-lts:
