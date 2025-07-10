@@ -26,12 +26,12 @@ function add_hotfix_testing_code {
 	then
 		echo "Running: git fetch upstream tag \"${LIFERAY_RELEASE_HOTFIX_TEST_TAG}\""
 
-		git fetch -v upstream tag "${LIFERAY_RELEASE_HOTFIX_TEST_TAG}" || return 1
+		git fetch --verbose upstream tag "${LIFERAY_RELEASE_HOTFIX_TEST_TAG}" || return 1
 	fi
 
-	echo "Running: git cherry-pick -n \"${LIFERAY_RELEASE_HOTFIX_TEST_SHA}\""
+	echo "Running: git cherry-pick --no-commit \"${LIFERAY_RELEASE_HOTFIX_TEST_SHA}\""
 
-	git cherry-pick -n "${LIFERAY_RELEASE_HOTFIX_TEST_SHA}" || return 1
+	git cherry-pick --no-commit "${LIFERAY_RELEASE_HOTFIX_TEST_SHA}" || return 1
 }
 
 function add_portal_patcher_properties_jar {

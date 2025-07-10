@@ -43,7 +43,7 @@ function generate_javadocs {
 	then
 		lc_log INFO "Generating javadocs for ${_PRODUCT_VERSION}."
 
-		git reset --hard && git clean -dfx
+		git reset --hard && git clean -d --force -x
 
 		git fetch --no-tags upstream "refs/tags/${_PRODUCT_VERSION}:refs/tags/${_PRODUCT_VERSION}"
 

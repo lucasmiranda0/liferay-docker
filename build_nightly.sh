@@ -8,7 +8,7 @@ do
 	then
 		docker system prune --all --force
 
-		git clean -dfx
+		git clean -d --force -x
 
 		LIFERAY_DOCKER_DEVELOPER_MODE=true LIFERAY_DOCKER_IMAGE_FILTER=7.4.13.nightly ./build_all_images.sh --push
 	else

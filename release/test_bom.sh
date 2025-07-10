@@ -34,7 +34,7 @@ function main {
 
 	git reset --hard &> /dev/null
 
-	git clean -dfx &> /dev/null
+	git clean -d --force -x &> /dev/null
 
 	git checkout master &> /dev/null
 
@@ -86,7 +86,7 @@ function set_up {
 
 	git reset --hard &> /dev/null
 
-	git clean -dfx &> /dev/null
+	git clean -d --force -x &> /dev/null
 
 	git branch --delete "${_PRODUCT_VERSION}" &> /dev/null
 
@@ -103,7 +103,7 @@ function tear_down {
 	rm --force "${_RELEASE_ROOT_DIR}/test-dependencies/liferay-dxp-tomcat-2024.q2.6-1721635298.zip"
 	rm --force "${_RELEASE_ROOT_DIR}/test-dependencies/liferay-portal-tomcat-7.4.3.120-ga120-1718225443.zip"
 
-	git clean -dfx &> /dev/null
+	git clean -d --force -x &> /dev/null
 
 	unset LIFERAY_RELEASE_PRODUCT_NAME
 	unset _ARTIFACT_RC_VERSION

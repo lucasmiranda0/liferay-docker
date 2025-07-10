@@ -13,7 +13,7 @@ function clean_portal_repository {
 		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
 	fi
 
-	git reset --hard && git clean -dfx
+	git reset --hard && git clean -d --force -x
 }
 
 function clone_repository {
@@ -210,7 +210,7 @@ function update_portal_repository {
 		return "${LIFERAY_COMMON_EXIT_CODE_BAD}"
 	fi
 
-	git reset --hard && git clean -dfx
+	git reset --hard && git clean -d --force -x
 
 	git checkout "${checkout_ref}"
 
@@ -231,7 +231,7 @@ function update_release_tool_repository {
 
 	lc_cd "${_PROJECTS_DIR}"/liferay-release-tool-ee
 
-	git reset --hard && git clean -dfx
+	git reset --hard && git clean -d --force -x
 
 	local release_tool_sha=$(lc_get_property "${_PROJECTS_DIR}"/liferay-portal-ee/release.properties "release.tool.sha")
 
