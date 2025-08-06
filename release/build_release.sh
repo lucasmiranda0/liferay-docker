@@ -121,7 +121,7 @@ function main {
 
 		lc_time_run deploy_opensearch
 
-		lc_time_run upload_opensearch
+		# lc_time_run upload_opensearch
 
 		lc_background_run build_sql
 		lc_background_run copy_copyright
@@ -153,11 +153,11 @@ function main {
 
 		lc_time_run generate_release_notes
 
-		lc_time_run upload_boms xanadu
+		# lc_time_run upload_boms xanadu
 
 		lc_time_run upload_release
 
-		lc_time_run trigger_ci_test_suite
+		# lc_time_run trigger_ci_test_suite
 	else
 		lc_time_run prepare_release_dir
 

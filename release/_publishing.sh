@@ -304,7 +304,7 @@ function upload_release {
 
 	gsutil rm -r "gs://liferay-releases-candidates/${_PRODUCT_VERSION}-*"
 
-	for file in $(ls --almost-all --ignore "*.jar*" --ignore "*.pom*")
+	for file in $(ls --almost-all --ignore "*.pom*")
 	do
 		if [ -f "${file}" ]
 		then
