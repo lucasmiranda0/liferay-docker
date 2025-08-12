@@ -6,8 +6,13 @@ source ./build_bundle_image.sh --test
 function main {
 	set_up
 
-	test_build_bundle_image_get_latest_tomcat_version
-	test_build_bundle_image_set_parent_image
+	if [ "${#}" -eq 1 ]
+	then
+		"${1}"
+	else
+		test_build_bundle_image_get_latest_tomcat_version
+		test_build_bundle_image_set_parent_image
+	fi
 
 	tear_down
 }
@@ -92,4 +97,4 @@ function _test_build_bundle_image_set_parent_image {
 	rm --force expected.Dockerfile
 }
 
-main
+main "${@}"

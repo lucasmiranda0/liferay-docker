@@ -12,24 +12,49 @@ function main {
 		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
 	fi
 
-	test_bom_generate_pom_release_bom_api_dxp
-	test_bom_generate_pom_release_bom_compile_only_dxp
-	test_bom_generate_pom_release_bom_distro_dxp
-	test_bom_generate_pom_release_bom_dxp
-	test_bom_generate_pom_release_bom_third_party_dxp
+	if [ "${#}" -eq 1 ]
+	then
+		if [[ "${1}" == *_dxp ]]
+		then
+			"${1}"
+		elif [[ "${1}" == *_portal ]]
+		then
+			set_up_portal_tests
 
-	LIFERAY_RELEASE_PRODUCT_NAME="portal"
-	_BUNDLES_DIR="${_RELEASE_ROOT_DIR}/test-dependencies/liferay-portal"
-	_PRODUCT_VERSION="7.4.3.120-ga120"
+			"${1}"
 
-	_ARTIFACT_RC_VERSION="$(echo "${_PRODUCT_VERSION}" | cut --delimiter='-' --fields=1)-${_BUILD_TIMESTAMP}"
+			clean_portal_ee
+		else
+			clean_portal_ee
 
-	test_bom_generate_pom_release_bom_api_portal
-	test_bom_generate_pom_release_bom_compile_only_portal
-	test_bom_generate_pom_release_bom_distro_portal
-	test_bom_generate_pom_release_bom_portal
-	test_bom_generate_pom_release_bom_third_party_portal
+			"${1}"
+		fi
+	else	
+		test_bom_generate_pom_release_bom_api_dxp
+		test_bom_generate_pom_release_bom_compile_only_dxp
+		test_bom_generate_pom_release_bom_distro_dxp
+		test_bom_generate_pom_release_bom_dxp
+		test_bom_generate_pom_release_bom_third_party_dxp
 
+		set_up_portal_tests
+
+		test_bom_generate_pom_release_bom_api_portal
+		test_bom_generate_pom_release_bom_compile_only_portal
+		test_bom_generate_pom_release_bom_distro_portal
+		test_bom_generate_pom_release_bom_portal
+		test_bom_generate_pom_release_bom_third_party_portal
+
+		clean_portal_ee
+
+		test_bom_copy_file
+		test_bom_copy_tld
+		test_bom_manage_bom_jar
+	fi
+
+	tear_down
+}
+
+function clean_portal_ee {
 	lc_cd "${_PROJECTS_DIR}"/liferay-portal-ee
 
 	git reset --hard &> /dev/null
@@ -41,12 +66,6 @@ function main {
 	lc_cd "${_RELEASE_ROOT_DIR}"
 
 	_PROJECTS_DIR="${PWD}/test-dependencies/actual"
-
-	test_bom_copy_file
-	test_bom_copy_tld
-	test_bom_manage_bom_jar
-
-	tear_down
 }
 
 function set_up {
@@ -95,6 +114,14 @@ function set_up {
 	git checkout "${_PRODUCT_VERSION}" &> /dev/null
 
 	lc_cd "${_RELEASE_ROOT_DIR}"
+}
+
+function set_up_portal_tests {
+	LIFERAY_RELEASE_PRODUCT_NAME="portal"
+	_BUNDLES_DIR="${_RELEASE_ROOT_DIR}/test-dependencies/liferay-portal"
+	_PRODUCT_VERSION="7.4.3.120-ga120"
+
+	_ARTIFACT_RC_VERSION="$(echo "${_PRODUCT_VERSION}" | cut --delimiter='-' --fields=1)-${_BUILD_TIMESTAMP}"
 }
 
 function tear_down {
@@ -276,4 +303,4 @@ function test_bom_manage_bom_jar {
 	rm --force --recursive temp_dir_manage_bom_jar/META-INF
 }
 
-main
+main "${@}"
