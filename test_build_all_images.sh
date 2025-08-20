@@ -68,7 +68,7 @@ function test_build_all_images_is_container_healthy {
 
 function test_build_all_images_latest_is_not_slim {
 	echo -e "Running test_build_all_images_latest_is_not_slim for version ${1}.\n"
-
+	echo -e "DOCKER IMAGES: $(docker images)"
 	assert_equals \
 		$(docker images --filter "reference=liferay/dxp:${1}" --format "{{.ID}}") \
 		$(docker images --filter "reference=liferay/dxp:latest" --format "{{.ID}}")
