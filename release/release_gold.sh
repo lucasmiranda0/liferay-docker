@@ -4,6 +4,7 @@ source ../_liferay_common.sh
 source ../_release_common.sh
 source ./_git.sh
 source ./_github.sh
+source ./_jdk.sh
 source ./_jira.sh
 source ./_product.sh
 source ./_product_info_json.sh
@@ -82,34 +83,36 @@ function main {
 		return
 	fi
 
-	check_usage
+	# check_usage
 
-	check_supported_versions
+	# check_supported_versions
 
-	init_gcs
+	# init_gcs
+	_PRODUCT_VERSION="2025.q2.12"
+	lc_time_run set_jdk_version_and_parameters
 
-	lc_time_run promote_packages
+	# lc_time_run promote_packages
 
-	lc_time_run tag_release
+	# lc_time_run tag_release
 
-	promote_boms xanadu
+	# promote_boms xanadu
 
-	if (! is_quarterly_release && ! is_7_4_release)
-	then
-		lc_log INFO "Do not update product_info.json for quarterly and 7.4 releases."
+	# if (! is_quarterly_release && ! is_7_4_release)
+	# then
+	# 	lc_log INFO "Do not update product_info.json for quarterly and 7.4 releases."
 
-		lc_time_run generate_product_info_json
+	# 	lc_time_run generate_product_info_json
 
-		lc_time_run upload_product_info_json
-	fi
+	# 	lc_time_run upload_product_info_json
+	# fi
 
-	lc_time_run generate_releases_json
+	# lc_time_run generate_releases_json
 
-	lc_time_run reference_new_releases
+	# lc_time_run reference_new_releases
 
 	lc_time_run test_boms
 
-	lc_time_run update_salesforce_product_version
+	# lc_time_run update_salesforce_product_version
 
 	#if [ -d "${_RELEASE_ROOT_DIR}/dev/projects" ]
 	#then
@@ -126,9 +129,9 @@ function main {
 
 	#lc_time_run upload_to_docker_hub
 
-	lc_time_run add_patcher_project_version
+	# lc_time_run add_patcher_project_version
 
-	lc_time_run upload_to_docker_hub "release-gold"
+	# lc_time_run upload_to_docker_hub "release-gold"
 }
 
 function prepare_next_release_branch {
@@ -502,6 +505,10 @@ function tag_release {
 }
 
 function test_boms {
+	LIFERAY_RELEASE_PRODUCT_NAME="dxp"
+	_PRODUCT_VERSION="2025.q2.12"
+	java -version
+	rm -rf /opt/java/jenkins/workspace/release-gold/release/temp_dir_test_boms/.gradle/caches/modules-2/files-2.1/com.liferay.portal/release.dxp.api/2025.q2.12
 	if is_7_4_u_release
 	then
 		lc_log INFO "Skipping test BOMs for ${_PRODUCT_VERSION}."
