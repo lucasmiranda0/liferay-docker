@@ -32,6 +32,11 @@ function check_usage {
 }
 
 function main {
+	if [[ " ${@} " =~ " --release-candidate " ]]
+	then
+		return
+	fi
+
 	check_usage
 
 	lc_time_run scan_docker_images
@@ -128,4 +133,10 @@ function scan_docker_images {
 	rm --force ./twistcli
 }
 
-main
+function scan_release_candidate_docker_image {
+	LIFERAY_IMAGE_NAMES="liferay/release-candidates:${_PRODUCT_VERSION}-${_BUILD_TIMESTAMP}"
+
+	scan_docker_images
+}
+
+main "${@}"
