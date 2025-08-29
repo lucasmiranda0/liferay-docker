@@ -127,6 +127,10 @@ function scan_docker_images {
 			lc_log INFO "The result of scan for ${image_name} is: FAIL."
 
 			lc_log ERROR "The Docker image ${image_name} has security vulnerabilities."
+
+			rm --force ./twistcli
+
+			return "${LIFERAY_COMMON_EXIT_CODE_BAD}"
 		fi
 	done
 
