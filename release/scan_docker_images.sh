@@ -119,6 +119,11 @@ function scan_docker_images {
 
 		lc_log INFO "${scan_output}"
 
+		if [[ ${image_name} == "liferay/release-candidates"* ]]
+		then
+			rm --force ./twistcli
+		fi
+
 		if [[ ${scan_output} == *"Compliance threshold check results: PASS"* ]] &&
 		   [[ ${scan_output} == *"Vulnerability threshold check results: PASS"* ]]
 		then
@@ -128,13 +133,9 @@ function scan_docker_images {
 
 			lc_log ERROR "The Docker image ${image_name} has security vulnerabilities."
 
-			rm --force ./twistcli
-
 			return "${LIFERAY_COMMON_EXIT_CODE_BAD}"
 		fi
 	done
-
-	rm --force ./twistcli
 }
 
 function scan_release_candidate_docker_image {
