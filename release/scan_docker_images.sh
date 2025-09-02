@@ -40,6 +40,8 @@ function main {
 	check_usage
 
 	lc_time_run scan_docker_images
+
+	rm --force ./twistcli
 }
 
 function print_help {
