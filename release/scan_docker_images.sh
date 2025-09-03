@@ -102,7 +102,7 @@ function scan_docker_images {
 
 	local scan_result=0
 
-	echo "${LIFERAY_IMAGE_NAMES}" | tr ',' '\n' | while read -r image_name
+	while read -r image_name
 	do
 		lc_log INFO "Scanning ${image_name}."
 
@@ -132,7 +132,7 @@ function scan_docker_images {
 
 			scan_result="${LIFERAY_COMMON_EXIT_CODE_BAD}"
 		fi
-	done
+	done < <(echo "${LIFERAY_IMAGE_NAMES}" | tr ',' '\n')
 
 	rm --force ./twistcli
 
