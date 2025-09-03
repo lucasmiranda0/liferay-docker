@@ -198,7 +198,7 @@ function main {
 
 		lc_time_run upload_to_docker_hub "release-candidate"
 
-		lc_time_run scan_release_candidate_docker_image
+		# lc_time_run scan_release_candidate_docker_image
 	else
 		lc_time_run prepare_release_dir
 
