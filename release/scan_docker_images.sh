@@ -3,6 +3,8 @@
 source ../_liferay_common.sh
 
 function check_usage {
+	LIFERAY_IMAGE_NAMES=$(echo "${@}" | tr ' ' ',')
+
 	if [ -z "${LIFERAY_IMAGE_NAMES}" ] ||
 	   [ -z "${LIFERAY_PRISMA_CLOUD_ACCESS_KEY}" ] ||
 	   [ -z "${LIFERAY_PRISMA_CLOUD_SECRET}" ]
@@ -31,17 +33,6 @@ function check_usage {
 	mkdir --parents "${LIFERAY_COMMON_LOG_DIR}"
 }
 
-function main {
-	if [[ " ${@} " =~ " --release-candidate " ]]
-	then
-		return
-	fi
-
-	check_usage
-
-	lc_time_run scan_docker_images
-}
-
 function print_help {
 	echo "Usage: LIFERAY_IMAGE_NAMES=<image name> ${0}"
 	echo ""
@@ -57,6 +48,8 @@ function print_help {
 }
 
 function scan_docker_images {
+	check_usage "${@}"
+
 	local api_url="https://api.eu.prismacloud.io"
 	local data=$(
 		cat <<- END
@@ -138,11 +131,3 @@ function scan_docker_images {
 
 	return "${scan_result}"
 }
-
-function scan_release_candidate_docker_image {
-	LIFERAY_IMAGE_NAMES="liferay/release-candidates:${_PRODUCT_VERSION}-${_BUILD_TIMESTAMP}"
-
-	scan_docker_images
-}
-
-main "${@}"
