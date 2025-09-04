@@ -216,6 +216,8 @@ function update_portal_repository {
 
 	git status
 
+	git cherry-pick fb49ffc0090415a8db30ad6fa5bf508d38abd78e
+
 	echo "${LIFERAY_RELEASE_GIT_REF}" > "${_BUILD_DIR}"/liferay-portal-ee.sha
 }
 
