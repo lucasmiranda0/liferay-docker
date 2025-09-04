@@ -34,15 +34,13 @@ function check_usage_scan_docker_images {
 }
 
 function print_help {
-	echo "Usage: LIFERAY_IMAGE_NAMES=<image name> ${0}"
-	echo ""
 	echo "The script reads the following environment variables:"
 	echo ""
 	echo "    LIFERAY_IMAGE_NAMES: Comma separated list of DXP or Portal Docker images"
 	echo "    LIFERAY_PRISMA_CLOUD_ACCESS_KEY: Prisma Cloud access key"
 	echo "    LIFERAY_PRISMA_CLOUD_SECRET: Prisma Cloud secret"
 	echo ""
-	echo "Example: LIFERAY_IMAGE_NAMES=liferay/dxp:2025.q1.5-lts,liferay/dxp:2024.q2.2 ${0}"
+	echo "Example: LIFERAY_IMAGE_NAMES=liferay/dxp:2025.q1.5-lts,liferay/dxp:2024.q2.2"
 
 	exit "${LIFERAY_COMMON_EXIT_CODE_HELP}"
 }
