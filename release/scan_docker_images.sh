@@ -2,7 +2,7 @@
 
 source ../_liferay_common.sh
 
-function check_usage {
+function check_usage_scan_docker_images {
 	LIFERAY_IMAGE_NAMES=$(echo "${@}" | tr ' ' ',')
 
 	if [ -z "${LIFERAY_IMAGE_NAMES}" ] ||
@@ -48,7 +48,7 @@ function print_help {
 }
 
 function scan_docker_images {
-	check_usage "${@}"
+	check_usage_scan_docker_images "${@}"
 
 	local api_url="https://api.eu.prismacloud.io"
 	local data=$(
