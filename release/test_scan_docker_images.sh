@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source ../_test_common.sh
+source ./scan_docker_images.sh
 
 function main {
 	set_up
@@ -40,13 +41,13 @@ function tear_down {
 
 function test_scan_docker_images_with_invalid_image {
 	assert_equals \
-		"$(./scan_docker_images.sh | cut --delimiter=' ' --fields=2-)" \
+		"$(check_usage_scan_docker_images ${LIFERAY_IMAGE_NAMES} | cut --delimiter=' ' --fields=2-)" \
 		"[ERROR] Unable to find liferay/dxp:test-image locally."
 }
 
 function test_scan_docker_images_without_parameters {
 	assert_equals \
-		"$(./scan_docker_images.sh)" \
+		"$(check_usage_scan_docker_images)" \
 		"$(cat test-dependencies/expected/test_scan_docker_images_without_parameters_output.txt)"
 }
 
