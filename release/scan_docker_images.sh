@@ -2,7 +2,7 @@
 
 source ../_liferay_common.sh
 
-function check_usage {
+function check_usage_scan_docker_images {
 	LIFERAY_IMAGE_NAMES=$(echo "${LIFERAY_IMAGE_NAMES}" | tr ' ' ',')
 
 	if [ -z "${LIFERAY_IMAGE_NAMES}" ] ||
@@ -39,7 +39,7 @@ function main {
 		return
 	fi
 
-	check_usage
+	check_usage_scan_docker_images
 
 	lc_time_run scan_docker_images
 }
