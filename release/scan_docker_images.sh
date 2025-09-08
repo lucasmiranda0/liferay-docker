@@ -3,6 +3,8 @@
 source ../_liferay_common.sh
 
 function check_usage {
+	LIFERAY_IMAGE_NAMES=$(echo "${LIFERAY_IMAGE_NAMES}" | tr ' ' ',')
+
 	if [ -z "${LIFERAY_IMAGE_NAMES}" ] ||
 	   [ -z "${LIFERAY_PRISMA_CLOUD_ACCESS_KEY}" ] ||
 	   [ -z "${LIFERAY_PRISMA_CLOUD_SECRET}" ]
