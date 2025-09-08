@@ -8,15 +8,15 @@ function main {
 
 	if [ "${#}" -eq 1 ]
 	then
-		if [ "${1}" == "test_scan_docker_images_with_invalid_image" ]
+		if [ "${1}" == "test_scan_docker_images_without_parameters" ]
 		then
-			"${1}"
-
 			tear_down
+
+			"${1}"
 		else
-			tear_down
-
 			"${1}"
+
+			tear_down
 		fi
 	else
 		test_scan_docker_images_with_invalid_image
