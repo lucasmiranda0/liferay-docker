@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source ../_test_common.sh
-source ./scan_docker_images.sh
+source ./_scan_docker_images.sh
 
 function main {
 	set_up
