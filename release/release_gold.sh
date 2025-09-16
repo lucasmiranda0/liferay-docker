@@ -190,7 +190,7 @@ function prepare_next_release {
 
 	lc_time_run prepare_next_release_branch "${product_group_version}" "${next_release_patch_version}"
 
-	lc_time_run update_release_info_date
+	lc_time_run prepare_next_update_release_info_date
 	
 	if [ -z "${LIFERAY_RELEASE_TEST_MODE}" ]
 	then
@@ -228,6 +228,13 @@ function prepare_next_release_pull_request {
 	fi
 
 	return "${exit_code}"
+}
+
+function prepare_next_update_release_info_date {
+	sed \
+		--expression "s/release.info.date=.*/release.info.date=$(date -d $(echo "${LIFERAY_NEXT_RELEASE_DATE}" | sed "s/[^0-9-]//g") +"%B %-d, %Y")/" \
+		--in-place \
+		release.properties
 }
 
 function print_help {
@@ -564,13 +571,6 @@ function test_boms {
 	then
 		return "${LIFERAY_COMMON_EXIT_CODE_BAD}"
 	fi
-}
-
-function update_release_info_date {
-	sed \
-		--expression "s/release.info.date=.*/release.info.date=$(date -d $(echo "${LIFERAY_NEXT_RELEASE_DATE}" | sed "s/[^0-9-]//g") +"%B %-d, %Y")/" \
-		--in-place \
-		release.properties
 }
 
 function update_salesforce_product_version {
