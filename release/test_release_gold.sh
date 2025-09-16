@@ -83,12 +83,7 @@ function test_release_gold_get_tag_name {
 }
 
 function test_release_gold_not_prepare_next_release_branch {
-	if [ ! $(echo "${LIFERAY_RELEASE_PREPARE_NEXT_RELEASE_BRANCH}" | grep --ignore-case "true") ]
-	then
-		_test_release_gold_not_prepare_next_release_branch "2024.q1.12" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	fi
-
-	_test_release_gold_not_prepare_next_release_branch "2023.q2.5" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+	_test_release_gold_not_prepare_next_release_branch "2024.q2.0" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
 	_test_release_gold_not_prepare_next_release_branch "7.3.10-u36" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
 	_test_release_gold_not_prepare_next_release_branch "7.4.13-u101" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
 	_test_release_gold_not_prepare_next_release_branch "7.4.3.125-ga125" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
@@ -172,7 +167,7 @@ function test_release_gold_update_release_info_date {
 function _test_release_gold_not_prepare_next_release_branch {
 	_PRODUCT_VERSION="${1}"
 
-	prepare_next_release_branch 1> /dev/null
+	prepare_next_release 1> /dev/null
 
 	assert_equals "${?}" "${2}"
 }
