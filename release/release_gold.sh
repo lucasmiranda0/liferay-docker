@@ -149,7 +149,10 @@ function prepare_next_release {
 
 	lc_time_run update_release_info_date
 	
-	lc_time_run prepare_next_release_pull_request "${product_group_version}" "${next_release_patch_version}" "${quarterly_release_branch}"
+	if [ -z "${LIFERAY_RELEASE_TEST_MODE}" ]
+	then
+		lc_time_run prepare_next_release_pull_request "${product_group_version}" "${next_release_patch_version}" "${quarterly_release_branch}"
+	fi
 }
 
 function prepare_next_release_branch {
