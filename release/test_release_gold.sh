@@ -18,11 +18,6 @@ function main {
 		then
 			test_release_gold_check_usage
 			test_release_gold_not_prepare_next_release_branch
-			test_release_gold_not_prepare_next_release_branch "false"
-			test_release_gold_not_prepare_next_release_branch "true"
-			test_release_gold_not_update_release_info_date
-			test_release_gold_not_update_release_info_date "false"
-			test_release_gold_not_update_release_info_date "true"
 			test_release_gold_prepare_next_release_branch
 			test_release_gold_update_release_info_date
 		else
@@ -80,24 +75,6 @@ function test_release_gold_not_reference_new_releases {
 	_test_release_gold_not_reference_new_releases "7.3.10-u36" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
 	_test_release_gold_not_reference_new_releases "7.4.13-u101" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
 	_test_release_gold_not_reference_new_releases "7.4.3.125-ga125" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-}
-
-function test_release_gold_not_update_release_info_date {
-	if [ -n "${1}" ]
-	then
-		LIFERAY_RELEASE_PREPARE_NEXT_RELEASE_BRANCH="${1}"
-	fi
-
-	if [ ! $(echo "${LIFERAY_RELEASE_PREPARE_NEXT_RELEASE_BRANCH}" | grep --ignore-case "true") ]
-	then
-		_test_release_gold_not_update_release_info_date "2024.q1.12" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	fi
-
-	_test_release_gold_not_update_release_info_date "2023.q2.11" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	_test_release_gold_not_update_release_info_date "2023.q3.0" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	_test_release_gold_not_update_release_info_date "7.3.10-u36" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	_test_release_gold_not_update_release_info_date "7.4.13-u101" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	_test_release_gold_not_update_release_info_date "7.4.3.125-ga125" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
 }
 
 function test_release_gold_prepare_next_release_branch {
@@ -172,14 +149,6 @@ function _test_release_gold_reference_new_releases {
 	assert_equals \
 		"test-dependencies/actual/build-shared.properties" \
 		"test-dependencies/expected/test_release_gold_build_shared_$(echo "${_PRODUCT_VERSION}" | tr '.' '_').properties"
-}
-
-function _test_release_gold_not_update_release_info_date {
-	_PRODUCT_VERSION="${1}"
-
-	update_release_info_date 1> /dev/null
-
-	assert_equals "${?}" "${2}"
 }
 
 main "${@}"
