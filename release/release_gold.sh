@@ -121,6 +121,39 @@ function main {
 }
 
 function prepare_next_release {
+	if ! is_quarterly_release ||
+	   [ ! $(echo "${LIFERAY_RELEASE_PREPARE_NEXT_RELEASE_BRANCH}" | grep --ignore-case "true") ] ||
+	   [[ "$(get_release_patch_version)" -eq 0 ]]
+	then
+		lc_log INFO "Skipping the preparation of the next release branch."
+
+		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+	fi
+
+	if [ -z "${LIFERAY_RELEASE_TEST_MODE}" ]
+	then
+		rm --force --recursive releases.json
+
+		LIFERAY_COMMON_DOWNLOAD_SKIP_CACHE="true" lc_download "https://releases.liferay.com/releases.json" releases.json
+	fi
+
+	local latest_quarterly_product_version="$(\
+		jq --raw-output ".[] | \
+			select(.productGroupVersion == \"${1}\" and .promoted == \"true\") | \
+			.targetPlatformVersion" releases.json)"
+
+	if [ -z "${LIFERAY_RELEASE_TEST_MODE}" ]
+	then
+		rm --force --recursive releases.json
+	fi
+
+	if [ "${_PRODUCT_VERSION}" != "${latest_quarterly_product_version}" ]
+	then
+		lc_log INFO "The ${_PRODUCT_VERSION} version is not the latest quarterly release. Skipping the preparation of the next release branch."
+
+		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+	fi
+
 	local product_group_version="$(get_product_group_version)"
 
 	local quarterly_release_branch="release-${product_group_version}"
@@ -156,38 +189,6 @@ function prepare_next_release {
 }
 
 function prepare_next_release_branch {
-	if [ ! $(echo "${LIFERAY_RELEASE_PREPARE_NEXT_RELEASE_BRANCH}" | grep --ignore-case "true") ] ||
-	   ! is_quarterly_release
-	then
-		lc_log INFO "Skipping the preparation of the next release branch."
-
-		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	fi
-
-	if [ -z "${LIFERAY_RELEASE_TEST_MODE}" ]
-	then
-		rm --force --recursive releases.json
-
-		LIFERAY_COMMON_DOWNLOAD_SKIP_CACHE="true" lc_download "https://releases.liferay.com/releases.json" releases.json
-	fi
-
-	local latest_quarterly_product_version="$(\
-		jq --raw-output ".[] | \
-			select(.productGroupVersion == \"${1}\" and .promoted == \"true\") | \
-			.targetPlatformVersion" releases.json)"
-
-	if [ -z "${LIFERAY_RELEASE_TEST_MODE}" ]
-	then
-		rm --force --recursive releases.json
-	fi
-
-	if [ "${_PRODUCT_VERSION}" != "${latest_quarterly_product_version}" ]
-	then
-		lc_log INFO "The ${_PRODUCT_VERSION} version is not the latest quarterly release. Skipping the preparation of the next release branch."
-
-		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	fi
-
 	sed \
 		--expression "s/release.info.version.display.name\[master-private\]=.*/release.info.version.display.name[master-private]=${1^^}.${2}/" \
 		--in-place \
@@ -556,16 +557,6 @@ function test_boms {
 }
 
 function update_release_info_date {
-	if ! is_quarterly_release ||
-	   [ ! $(echo "${LIFERAY_RELEASE_PREPARE_NEXT_RELEASE_BRANCH}" | grep --ignore-case "true") ] ||
-	   [[ "$(get_release_patch_version)" -eq 0 ]] ||
-	   [[ "$(get_release_year)" -lt 2024 ]]
-	then
-		lc_log INFO "Skipping the release info update."
-
-		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	fi
-
 	sed \
 		--expression "s/release.info.date=.*/release.info.date=$(date -d $(echo "${LIFERAY_NEXT_RELEASE_DATE}" | sed "s/[^0-9-]//g") +"%B %-d, %Y")/" \
 		--in-place \
