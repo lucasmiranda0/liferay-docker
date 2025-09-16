@@ -131,7 +131,9 @@ function main {
 }
 
 function prepare_next_release {
-	local quarterly_release_branch="release-2025.q3"
+	local product_group_version="$(get_product_group_version)"
+
+	local quarterly_release_branch="release-${product_group_version}"
 
 	lc_time_run prepare_branch_to_commit "${_PROJECTS_DIR}/liferay-portal-ee" "liferay-portal-ee" "${quarterly_release_branch}"
 
