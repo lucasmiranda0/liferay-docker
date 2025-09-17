@@ -80,8 +80,8 @@ function test_release_gold_not_reference_new_releases {
 function test_release_gold_prepare_next_release_branch {
 	LIFERAY_RELEASE_PREPARE_NEXT_RELEASE_BRANCH="true"
 
-	_test_release_gold_prepare_next_release_branch "2024.q1.12" "2024.Q1.13"
-	_test_release_gold_prepare_next_release_branch "2025.q1.1-lts" "2025.Q1.2 LTS"
+	_test_release_gold_prepare_next_release_branch "2024.q1" "13" "2024.Q1.13"
+	_test_release_gold_prepare_next_release_branch "2025.q1" "2 LTS" "2025.Q1.2 LTS"
 }
 
 function _test_release_gold_prepare_next_release_branch {
@@ -89,13 +89,13 @@ function _test_release_gold_prepare_next_release_branch {
 
 	local current_dir="${PWD}"
 
-	prepare_next_release &> /dev/null
+	prepare_next_release_branch "${1}" "${2}" &> /dev/null
 
 	assert_equals \
 		"$(lc_get_property "${_PROJECTS_DIR}"/liferay-portal-ee/release.properties "release.info.version.display.name[master-private]")" \
-		"${2}" \
+		"${3}" \
 		"$(lc_get_property "${_PROJECTS_DIR}"/liferay-portal-ee/release.properties "release.info.version.display.name[release-private]")" \
-		"${2}"
+		"${3}"
 
 	lc_cd "${current_dir}"
 }
