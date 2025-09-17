@@ -19,7 +19,7 @@ function main {
 			test_release_gold_check_usage
 			test_release_gold_not_prepare_next_release
 			test_release_gold_prepare_next_release_branch
-			test_release_gold_update_release_info_date
+			test_release_gold_prepare_next_update_release_info_date
 		else
 			echo -e "The directory ${_PROJECTS_DIR}/liferay-portal-ee does not exist.\n"
 		fi
@@ -109,12 +109,14 @@ function test_release_gold_reference_new_releases {
 	done
 }
 
-function test_release_gold_update_release_info_date {
+function test_release_gold_prepare_next_update_release_info_date {
 	LIFERAY_NEXT_RELEASE_DATE="2025-10-11"
-	LIFERAY_RELEASE_PREPARE_NEXT_RELEASE_BRANCH="true"
-	_PRODUCT_VERSION="2024.q2.12"
 
-	prepare_next_release &> /dev/null
+	lc_cd "${_PROJECTS_DIR}/liferay-portal-ee" 2> /dev/null
+
+	prepare_next_update_release_info_date &> /dev/null
+
+	lc_cd "${_PROJECTS_DIR}/liferay-docker/release"
 
 	assert_equals \
 		"$(lc_get_property "${_PROJECTS_DIR}"/liferay-portal-ee/release.properties "release.info.date")" \
