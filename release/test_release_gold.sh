@@ -18,7 +18,7 @@ function main {
 		then
 			test_release_gold_check_usage
 			test_release_gold_get_tag_name
-			test_release_gold_not_prepare_next_release_branch
+			test_release_gold_not_prepare_next_release
 			test_release_gold_prepare_next_release_branch
 			test_release_gold_update_release_info_date
 		else
@@ -77,11 +77,11 @@ function test_release_gold_get_tag_name {
 	LIFERAY_RELEASE_PRODUCT_NAME="dxp"
 }
 
-function test_release_gold_not_prepare_next_release_branch {
-	_test_release_gold_not_prepare_next_release_branch "2024.q2.0" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	_test_release_gold_not_prepare_next_release_branch "7.3.10-u36" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	_test_release_gold_not_prepare_next_release_branch "7.4.13-u101" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	_test_release_gold_not_prepare_next_release_branch "7.4.3.125-ga125" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+function test_release_gold_not_prepare_next_release {
+	_test_release_gold_not_prepare_next_release "2024.q2.0" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+	_test_release_gold_not_prepare_next_release "7.3.10-u36" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+	_test_release_gold_not_prepare_next_release "7.4.13-u101" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+	_test_release_gold_not_prepare_next_release "7.4.3.125-ga125" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
 }
 
 function test_release_gold_not_reference_new_releases {
@@ -141,7 +141,7 @@ function test_release_gold_update_release_info_date {
 		"October 11, 2025"
 }
 
-function _test_release_gold_not_prepare_next_release_branch {
+function _test_release_gold_not_prepare_next_release {
 	_PRODUCT_VERSION="${1}"
 
 	prepare_next_release 1> /dev/null
