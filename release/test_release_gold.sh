@@ -81,7 +81,7 @@ function test_release_gold_prepare_next_release_branch {
 	LIFERAY_RELEASE_PREPARE_NEXT_RELEASE_BRANCH="true"
 
 	_test_release_gold_prepare_next_release_branch "2024.q1.12" "2024.Q1.13"
-	_test_release_gold_prepare_next_release_branch "2025.q1.0" "2025.Q1.1 LTS"
+	_test_release_gold_prepare_next_release_branch "2025.q1.1-lts" "2025.Q1.2 LTS"
 }
 
 function _test_release_gold_prepare_next_release_branch {
