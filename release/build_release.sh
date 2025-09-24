@@ -20,15 +20,15 @@ function check_usage {
 	# TODO Remove once all systems are using LIFERAY_RELEASE_GIT_REF instead of LIFERAY_RELEASE_GIT_SHA
 	#
 
-	if [ -z "${LIFERAY_RELEASE_GIT_REF}" ]
-	then
-		LIFERAY_RELEASE_GIT_REF=${LIFERAY_RELEASE_GIT_SHA}
-	fi
+	# if [ -z "${LIFERAY_RELEASE_GIT_REF}" ]
+	# then
+	# 	LIFERAY_RELEASE_GIT_REF=${LIFERAY_RELEASE_GIT_SHA}
+	# fi
 
-	if [ -z "${LIFERAY_RELEASE_GIT_REF}" ]
-	then
-		print_help
-	fi
+	# if [ -z "${LIFERAY_RELEASE_GIT_REF}" ]
+	# then
+	# 	print_help
+	# fi
 
 	_BUILD_TIMESTAMP=$(date +%s)
 
@@ -106,7 +106,7 @@ function main {
 
 	check_usage
 
-	lc_time_run handle_automated_build
+	# lc_time_run handle_automated_build
 
 	print_variables
 
@@ -141,6 +141,13 @@ function main {
 
 	if [ "${LIFERAY_RELEASE_OUTPUT}" != "hotfix" ]
 	then
+		echo "${_PRODUCT_VERSION%-lts}"
+		lc_cd "${_PROJECTS_DIR}"/liferay-portal-ee
+
+		git checkout "${_PRODUCT_VERSION%-lts}"
+
+		lc_cd "${_RELEASE_ROOT_DIR}"
+
 		lc_time_run set_artifact_versions "${_PRODUCT_VERSION}" "${_BUILD_TIMESTAMP}"
 
 		lc_time_run update_release_info_date
@@ -155,51 +162,53 @@ function main {
 
 		lc_time_run build_product
 
-		lc_time_run add_ckeditor_license
+		# lc_time_run add_ckeditor_license
 
-		lc_time_run deploy_opensearch
+		# lc_time_run deploy_opensearch
 
-		lc_time_run upload_opensearch
+		# lc_time_run upload_opensearch
 
-		lc_background_run build_sql
-		lc_background_run copy_copyright
-		lc_background_run deploy_elasticsearch_sidecar
+		# lc_background_run build_sql
+		# lc_background_run copy_copyright
+		# lc_background_run deploy_elasticsearch_sidecar
 		lc_background_run clean_up_ignored_dxp_modules
 		lc_background_run clean_up_ignored_dxp_plugins
 
 		lc_wait
 
-		lc_time_run install_patching_tool
+		mv "${_BUNDLES_DIR}" "/opt/dev/projects/github/bundles-base"
 
-		lc_time_run generate_api_jars
+		# lc_time_run install_patching_tool
 
-		lc_time_run generate_api_source_jar
+		# lc_time_run generate_api_jars
 
-		lc_time_run generate_distro_jar
+		# lc_time_run generate_api_source_jar
 
-		generate_poms
+		# lc_time_run generate_distro_jar
 
-		lc_time_run warm_up_tomcat
+		# generate_poms
 
-		lc_time_run package_release
+		# lc_time_run warm_up_tomcat
 
-		lc_time_run package_boms
+		# lc_time_run package_release
 
-		lc_time_run generate_checksum_files
+		# lc_time_run package_boms
 
-		lc_time_run generate_release_properties_file
+		# lc_time_run generate_checksum_files
 
-		lc_time_run generate_release_notes
+		# lc_time_run generate_release_properties_file
 
-		lc_time_run upload_boms xanadu
+		# lc_time_run generate_release_notes
 
-		lc_time_run upload_release
+		# lc_time_run upload_boms xanadu
 
-		lc_time_run trigger_ci_test_suite
+		# lc_time_run upload_release
 
-		lc_time_run upload_to_docker_hub "release-candidate"
+		# lc_time_run trigger_ci_test_suite
 
-		lc_time_run scan_release_candidate_docker_image
+		# lc_time_run upload_to_docker_hub "release-candidate"
+
+		# lc_time_run scan_release_candidate_docker_image
 	else
 		lc_time_run prepare_release_dir
 

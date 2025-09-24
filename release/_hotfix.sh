@@ -104,8 +104,8 @@ function calculate_checksums {
 }
 
 function compare_jars {
-	local jar1=${_BUNDLES_DIR}/"${1}"
-	local jar2=${_RELEASE_DIR}/"${1}"
+	local jar1="/opt/dev/projects/github/bundles-base/${1}"
+	local jar2="${_BUNDLES_DIR}/${1}"
 
 	function compare_property_in_packaged_file {
 		local jar1="${1}"
