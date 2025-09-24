@@ -41,13 +41,13 @@ function add_licensing {
 		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
 	fi
 
-	if [ -e "${_BUILD_DIR}"/built.sha ] &&
-	   [ $(cat "${_BUILD_DIR}"/built.sha) == "${LIFERAY_RELEASE_GIT_REF}${LIFERAY_RELEASE_HOTFIX_TEST_SHA}" ]
-	then
-		lc_log INFO "${LIFERAY_RELEASE_GIT_REF} was already built in ${_BUILD_DIR}."
+	# if [ -e "${_BUILD_DIR}"/built.sha ] &&
+	#    [ $(cat "${_BUILD_DIR}"/built.sha) == "${LIFERAY_RELEASE_GIT_REF}${LIFERAY_RELEASE_HOTFIX_TEST_SHA}" ]
+	# then
+	# 	lc_log INFO "${LIFERAY_RELEASE_GIT_REF} was already built in ${_BUILD_DIR}."
 
-		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	fi
+	# 	return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+	# fi
 
 	lc_cd "${_PROJECTS_DIR}/liferay-release-tool-ee"
 
@@ -68,13 +68,13 @@ function add_licensing {
 function build_product {
 	trap 'return ${LIFERAY_COMMON_EXIT_CODE_BAD}' ERR
 
-	if [ -e "${_BUILD_DIR}"/built.sha ] &&
-	   [ $(cat "${_BUILD_DIR}"/built.sha) == "${LIFERAY_RELEASE_GIT_REF}${LIFERAY_RELEASE_HOTFIX_TEST_SHA}" ]
-	then
-		lc_log INFO "${LIFERAY_RELEASE_GIT_REF} was already built in ${_BUILD_DIR}."
+	# if [ -e "${_BUILD_DIR}"/built.sha ] &&
+	#    [ $(cat "${_BUILD_DIR}"/built.sha) == "${LIFERAY_RELEASE_GIT_REF}${LIFERAY_RELEASE_HOTFIX_TEST_SHA}" ]
+	# then
+	# 	lc_log INFO "${LIFERAY_RELEASE_GIT_REF} was already built in ${_BUILD_DIR}."
 
-		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	fi
+	# 	return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+	# fi
 
 	rm --force --recursive "${_BUNDLES_DIR}"
 
@@ -205,13 +205,13 @@ function clean_up_ignored_dxp_plugins {
 }
 
 function compile_product {
-	if [ -e "${_BUILD_DIR}"/built.sha ] &&
-	   [ $(cat "${_BUILD_DIR}"/built.sha) == "${LIFERAY_RELEASE_GIT_REF}${LIFERAY_RELEASE_HOTFIX_TEST_SHA}" ]
-	then
-		lc_log INFO "${LIFERAY_RELEASE_GIT_REF} was already built in ${_BUILD_DIR}."
+	# if [ -e "${_BUILD_DIR}"/built.sha ] &&
+	#    [ $(cat "${_BUILD_DIR}"/built.sha) == "${LIFERAY_RELEASE_GIT_REF}${LIFERAY_RELEASE_HOTFIX_TEST_SHA}" ]
+	# then
+	# 	lc_log INFO "${LIFERAY_RELEASE_GIT_REF} was already built in ${_BUILD_DIR}."
 
-		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	fi
+	# 	return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+	# fi
 
 	lc_cd "${_PROJECTS_DIR}/liferay-portal-ee"
 
@@ -346,13 +346,13 @@ function obfuscate_licensing {
 		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
 	fi
 
-	if [ -e "${_BUILD_DIR}"/built.sha ] &&
-	   [ $(cat "${_BUILD_DIR}"/built.sha) == "${LIFERAY_RELEASE_GIT_REF}${LIFERAY_RELEASE_HOTFIX_TEST_SHA}" ]
-	then
-		lc_log INFO "${LIFERAY_RELEASE_GIT_REF} was already built in ${_BUILD_DIR}."
+	# if [ -e "${_BUILD_DIR}"/built.sha ] &&
+	#    [ $(cat "${_BUILD_DIR}"/built.sha) == "${LIFERAY_RELEASE_GIT_REF}${LIFERAY_RELEASE_HOTFIX_TEST_SHA}" ]
+	# then
+	# 	lc_log INFO "${LIFERAY_RELEASE_GIT_REF} was already built in ${_BUILD_DIR}."
 
-		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	fi
+	# 	return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+	# fi
 
 	lc_cd "${_PROJECTS_DIR}/liferay-release-tool-ee/$(lc_get_property "${_PROJECTS_DIR}"/liferay-portal-ee/release.properties "release.tool.dir")"
 
@@ -443,13 +443,13 @@ function set_product_version {
 function set_up_profile {
 	lc_cd "${_PROJECTS_DIR}"/liferay-portal-ee
 
-	if [ -e "${_BUILD_DIR}"/built.sha ] &&
-	   [ $(cat "${_BUILD_DIR}"/built.sha) == "${LIFERAY_RELEASE_GIT_REF}${LIFERAY_RELEASE_HOTFIX_TEST_SHA}" ]
-	then
-		lc_log INFO "${LIFERAY_RELEASE_GIT_REF} was already built in ${_BUILD_DIR}."
+	# if [ -e "${_BUILD_DIR}"/built.sha ] &&
+	#    [ $(cat "${_BUILD_DIR}"/built.sha) == "${LIFERAY_RELEASE_GIT_REF}${LIFERAY_RELEASE_HOTFIX_TEST_SHA}" ]
+	# then
+	# 	lc_log INFO "${LIFERAY_RELEASE_GIT_REF} was already built in ${_BUILD_DIR}."
 
-		return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
-	fi
+	# 	return "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+	# fi
 
 	ant "setup-profile-${LIFERAY_RELEASE_PRODUCT_NAME}"
 }
