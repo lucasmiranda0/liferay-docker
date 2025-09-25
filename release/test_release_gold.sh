@@ -65,6 +65,11 @@ function test_release_gold_check_usage {
 }
 
 function test_release_gold_not_prepare_next_release {
+	if [ ! $(echo "${LIFERAY_RELEASE_PREPARE_NEXT_RELEASE_BRANCH}" | grep --ignore-case "true") ]
+	then
+		_test_release_gold_not_prepare_next_release "2024.q1.12" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
+	fi
+
 	_test_release_gold_not_prepare_next_release "2024.q2.0" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
 	_test_release_gold_not_prepare_next_release "7.3.10-u36" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
 	_test_release_gold_not_prepare_next_release "7.4.13-u101" "${LIFERAY_COMMON_EXIT_CODE_SKIPPED}"
