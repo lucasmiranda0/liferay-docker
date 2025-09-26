@@ -176,15 +176,13 @@ function prepare_next_release {
 }
 
 function prepare_next_release_branch {
-	sed \
-		--expression "s/release.info.version.display.name\[master-private\]=.*/release.info.version.display.name[master-private]=${1^^}.${2}/" \
-		--in-place \
-		"${_PROJECTS_DIR}/liferay-portal-ee/release.properties"
-
-	sed \
-		--expression "s/release.info.version.display.name\[release-private\]=.*/release.info.version.display.name[release-private]=${1^^}.${2}/" \
-		--in-place \
-		"${_PROJECTS_DIR}/liferay-portal-ee/release.properties"
+	for branch in master-private release-private
+	do
+		sed \
+			--expression "s/release.info.version.display.name\[${branch}\]=.*/release.info.version.display.name[${branch}]=${1^^}.${2}/" \
+			--in-place \
+			"${_PROJECTS_DIR}/liferay-portal-ee/release.properties"
+	done
 }
 
 function prepare_next_release_pull_request {
